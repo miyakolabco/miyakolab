@@ -818,7 +818,19 @@ button { font-family: inherit; cursor: pointer; }
   letter-spacing: 0.18em;
 }
 
-.ml-lightbox-stage {
+/* Viewport clips the sliding track; one "slide" fills it per piece */
+.ml-lightbox-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.ml-lightbox-track {
+  height: 100%;
+  /* transform + transition are set inline (driven by drag state) */
+  will-change: transform;
+}
+.ml-lightbox-slide {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -830,7 +842,6 @@ button { font-family: inherit; cursor: pointer; }
   background: #000;
   overflow: hidden;
   position: relative;
-  /* vertical 9:16 video — height-led so it fits the viewport */
 }
 .ml-lightbox-frame.is-vertical {
   height: min(78vh, 860px);
@@ -841,15 +852,21 @@ button { font-family: inherit; cursor: pointer; }
   aspect-ratio: 4 / 5;
 }
 @media (max-width: 640px) {
+  /* height-led so every 9:16 piece renders the exact same size,
+     regardless of the source's intrinsic ratio */
   .ml-lightbox-frame.is-vertical {
-    height: auto;
-    width: 100%;
-    max-height: 74vh;
+    height: 78vh;
+    width: auto;
+    aspect-ratio: 9 / 16;
+    max-height: 78vh;
+    max-width: 94vw;
   }
   .ml-lightbox-frame.is-still {
-    height: auto;
-    width: 100%;
-    max-height: 74vh;
+    height: 72vh;
+    width: auto;
+    aspect-ratio: 4 / 5;
+    max-height: 72vh;
+    max-width: 94vw;
   }
 }
 .ml-lightbox-meta {
@@ -888,37 +905,87 @@ button { font-family: inherit; cursor: pointer; }
   .ml-lightbox-nav { display: none; }
 }
 
-/* One-time swipe hint */
+/* One-time swipe hint — animated TikTok-style up-swipe gesture */
 .ml-lightbox-hint {
   position: absolute;
-  bottom: 32px;
+  bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
+  color: var(--kami);
+  pointer-events: none;
+  animation: hintPulse 4s ease-in-out both;
+}
+/* The gesture: a track with a dot that travels upward, plus chevrons */
+.ml-hint-gesture {
+  position: relative;
+  width: 44px;
+  height: 72px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--sumi) 55%, transparent);
+}
+.ml-hint-dot {
+  position: absolute;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: hintSwipe 1.5s cubic-bezier(.5,0,.3,1) infinite;
+}
+.ml-hint-chevrons {
+  position: absolute;
+  left: 50%;
+  top: -22px;
+  margin-left: -7px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ml-hint-chevrons span {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-top: 2px solid var(--kami);
+  border-right: 2px solid var(--kami);
+  transform: rotate(-45deg);
+  opacity: 0.3;
+}
+.ml-hint-chevrons span:nth-child(1) { animation: hintChevron 1.5s ease-in-out infinite 0s; }
+.ml-hint-chevrons span:nth-child(2) { animation: hintChevron 1.5s ease-in-out infinite 0.15s; }
+.ml-hint-chevrons span:nth-child(3) { animation: hintChevron 1.5s ease-in-out infinite 0.3s; }
+.ml-hint-label {
+  font-family: var(--f-mono);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.16em;
   color: var(--kami);
   background: color-mix(in srgb, var(--sumi) 70%, transparent);
-  border: 1px solid var(--rule-strong);
-  padding: 10px 16px;
-  letter-spacing: 0.14em;
-  animation: hintPulse 3.2s ease-in-out both;
-}
-.ml-lightbox-hint-arrows {
-  color: var(--accent);
-  font-size: 14px;
-  animation: hintBob 1.1s ease-in-out infinite;
+  padding: 6px 12px;
 }
 @keyframes hintPulse {
   0% { opacity: 0; }
-  15% { opacity: 1; }
-  80% { opacity: 1; }
+  10% { opacity: 1; }
+  85% { opacity: 1; }
   100% { opacity: 0; }
 }
-@keyframes hintBob {
-  0%, 100% { transform: translateY(-2px); }
-  50% { transform: translateY(2px); }
+/* dot travels from bottom of the track to the top, then resets */
+@keyframes hintSwipe {
+  0%   { top: 44px; opacity: 0; }
+  15%  { opacity: 1; }
+  70%  { top: 14px; opacity: 1; }
+  85%  { top: 14px; opacity: 0; }
+  100% { top: 44px; opacity: 0; }
+}
+@keyframes hintChevron {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
 
 /* ============================================================
