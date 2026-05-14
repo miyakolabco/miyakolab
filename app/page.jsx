@@ -24,9 +24,16 @@ const SERVICES = [
 
 export default function WorkPage() {
   const [activeCat, setActiveCat] = useState("video");
-  const [lightboxIndex, setLightboxIndex] = useState(null);
+  // Lightbox position in the 2D grid: { cat: <categoryIndex>, item: <itemIndex> }
+  const [lightboxPos, setLightboxPos] = useState(null);
 
-  const pieces = getWorkByCategory(activeCat);
+  // Map of categoryId -> pieces (used by the grid and the 2D lightbox)
+  const workByCat = CATEGORIES.reduce((acc, c) => {
+    acc[c.id] = getWorkByCategory(c.id);
+    return acc;
+  }, {});
+  const pieces = workByCat[activeCat];
+  const activeCatIndex = CATEGORIES.findIndex((c) => c.id === activeCat);
 
   return (
     <>
@@ -265,7 +272,7 @@ export default function WorkPage() {
                 <Reveal key={piece.id} delay={i * 70}>
                   <button
                     className="work-card"
-                    onClick={() => setLightboxIndex(i)}
+                    onClick={() => setLightboxPos({ cat: activeCatIndex, item: i })}
                     aria-label={`Open ${piece.title}`}
                   >
                     <div className="crop work-card-frame">
@@ -345,12 +352,13 @@ export default function WorkPage() {
 
       <Footer />
 
-      {/* Full-size viewer — swipe up/down through the active category */}
+      {/* Full-size viewer — 2D swipe: ↕ pieces in a category, ↔ between categories */}
       <Lightbox
-        pieces={pieces}
-        index={lightboxIndex}
-        onClose={() => setLightboxIndex(null)}
-        onNavigate={(next) => setLightboxIndex(next)}
+        categories={CATEGORIES}
+        workByCat={workByCat}
+        pos={lightboxPos}
+        onClose={() => setLightboxPos(null)}
+        onNavigate={(next) => setLightboxPos(next)}
       />
     </>
   );

@@ -818,16 +818,31 @@ button { font-family: inherit; cursor: pointer; }
   letter-spacing: 0.18em;
 }
 
-/* Viewport clips the sliding track; one "slide" fills it per piece */
+/* Viewport clips the 2D track */
 .ml-lightbox-viewport {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
+  touch-action: none;
 }
-.ml-lightbox-track {
+/* Horizontal track — one full-width column per category */
+.ml-lightbox-htrack {
+  display: flex;
   height: 100%;
-  /* transform + transition are set inline (driven by drag state) */
+  width: 100%;
+  will-change: transform;
+}
+.ml-lightbox-col {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+/* Vertical track inside a column — one slide per piece */
+.ml-lightbox-vtrack {
+  height: 100%;
   will-change: transform;
 }
 .ml-lightbox-slide {
@@ -860,30 +875,133 @@ button { font-family: inherit; cursor: pointer; }
   height: min(78vh, 900px);
   aspect-ratio: 4 / 5;
 }
+.ml-lightbox-frame.is-pages {
+  /* EPK / deck pages are landscape */
+  width: min(92vw, 1180px);
+  aspect-ratio: 16 / 9;
+  height: auto;
+  max-height: 80vh;
+}
 @media (max-width: 640px) {
   /* height-led so every 9:16 piece renders the exact same size,
      regardless of the source's intrinsic ratio */
   .ml-lightbox-frame.is-vertical {
-    height: 78vh;
+    height: 76vh;
     width: auto;
     aspect-ratio: 9 / 16;
-    max-height: 78vh;
+    max-height: 76vh;
     max-width: 94vw;
   }
   .ml-lightbox-frame.is-still {
-    height: 72vh;
+    height: 70vh;
     width: auto;
     aspect-ratio: 4 / 5;
-    max-height: 72vh;
+    max-height: 70vh;
     max-width: 94vw;
+  }
+  .ml-lightbox-frame.is-pages {
+    width: 94vw;
+    aspect-ratio: 16 / 9;
+    max-height: 70vh;
   }
 }
 .ml-lightbox-meta {
   text-align: center;
   max-width: 90vw;
 }
+/* Empty-category state */
+.ml-lightbox-empty {
+  color: var(--hai-2);
+  letter-spacing: 0.1em;
+  text-align: center;
+  padding: 40px 24px;
+  border: 1px dashed var(--rule-strong);
+}
 
-/* Up / down nav arrows — vertical pair on the right edge (desktop) */
+/* ---- Multi-page document viewer (EPK / deck) ---- */
+.ml-pages {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+}
+.ml-pages-track {
+  height: 100%;
+  will-change: transform;
+}
+.ml-pages-page {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ml-pages-page img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+/* Page dots — bottom centre */
+.ml-pages-dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 3;
+}
+.ml-pages-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--kami) 35%, transparent);
+  cursor: pointer;
+  transition: background-color 200ms ease, transform 200ms ease;
+}
+.ml-pages-dot.is-on {
+  background: var(--accent);
+  transform: scale(1.35);
+}
+.ml-pages-count {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  z-index: 3;
+  color: var(--kami);
+  background: color-mix(in srgb, var(--sumi) 65%, transparent);
+  padding: 4px 9px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+.ml-pages-nav {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 3;
+}
+.ml-pages-nav button {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--rule-strong);
+  background: color-mix(in srgb, var(--sumi) 55%, transparent);
+  color: var(--kami);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, opacity 160ms ease;
+}
+.ml-pages-nav button:hover:not(:disabled) { background: var(--kami); color: var(--sumi); }
+.ml-pages-nav button:disabled { opacity: 0.3; cursor: default; }
+@media (max-width: 640px) {
+  .ml-pages-nav { display: none; }
+}
+
+/* Up / down nav — vertical pair on the right edge (items within a category) */
 .ml-lightbox-nav {
   position: absolute;
   right: 24px;
@@ -894,7 +1012,19 @@ button { font-family: inherit; cursor: pointer; }
   gap: 10px;
   z-index: 2;
 }
-.ml-lightbox-arrow {
+/* Left / right nav — horizontal pair on the bottom edge (between categories) */
+.ml-lightbox-nav-h {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  z-index: 2;
+}
+.ml-lightbox-nav button,
+.ml-lightbox-nav-h button {
   width: 46px;
   height: 46px;
   border: 1px solid var(--rule-strong);
@@ -907,11 +1037,20 @@ button { font-family: inherit; cursor: pointer; }
   justify-content: center;
   transition: background-color 160ms ease, color 160ms ease, opacity 160ms ease;
 }
-.ml-lightbox-arrow:hover:not(:disabled) { background: var(--kami); color: var(--sumi); }
-.ml-lightbox-arrow:disabled { opacity: 0.3; cursor: default; }
+.ml-lightbox-nav button:hover:not(:disabled),
+.ml-lightbox-nav-h button:hover:not(:disabled) {
+  background: var(--kami);
+  color: var(--sumi);
+}
+.ml-lightbox-nav button:disabled,
+.ml-lightbox-nav-h button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
 /* On touch screens the swipe gesture replaces the arrows */
 @media (max-width: 640px) {
-  .ml-lightbox-nav { display: none; }
+  .ml-lightbox-nav,
+  .ml-lightbox-nav-h { display: none; }
 }
 
 /* One-time swipe hint — animated TikTok-style up-swipe gesture */
