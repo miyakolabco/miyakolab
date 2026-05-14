@@ -609,3 +609,275 @@ button { font-family: inherit; cursor: pointer; }
 @media (max-width: 640px) {
   .r-hide-mobile { display: none !important; }
 }
+
+/* ============================================================
+   VIDEO SLOTS + M SHOWREEL
+   ============================================================ */
+
+/* --- Generic video placeholder --- */
+.video-ph { overflow: hidden; }
+.video-ph-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 84px;
+  height: 84px;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--kami);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--sumi) 35%, transparent);
+  backdrop-filter: blur(2px);
+  transition: transform 360ms cubic-bezier(.2,.8,.2,1), background-color 360ms ease;
+}
+.video-ph:hover .video-ph-play {
+  transform: translate(-50%, -50%) scale(1.08);
+  background: color-mix(in srgb, var(--accent) 70%, transparent);
+}
+.video-ph-tri {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 11px 0 11px 18px;
+  border-color: transparent transparent transparent var(--kami);
+  margin-left: 5px;
+}
+.video-ph-tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  color: var(--kami);
+  background: color-mix(in srgb, var(--sumi) 55%, transparent);
+  padding: 5px 9px;
+  letter-spacing: 0.14em;
+  font-size: 10px;
+}
+
+/* --- M showreel: the M mark as a video window --- */
+.m-showreel { animation: fadein 600ms ease-out both; }
+.m-showreel-fill {
+  background:
+    radial-gradient(120% 90% at 25% 20%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 60%),
+    radial-gradient(110% 80% at 85% 95%, color-mix(in srgb, var(--fg) 22%, transparent), transparent 55%),
+    var(--fg);
+  background-size: 200% 200%, 200% 200%, 100% 100%;
+  animation: showreelDrift 14s ease-in-out infinite alternate;
+}
+@keyframes showreelDrift {
+  from { background-position: 0% 0%, 100% 100%, 0 0; }
+  to   { background-position: 100% 60%, 0% 20%, 0 0; }
+}
+.m-showreel-cue {
+  position: absolute;
+  left: 0;
+  bottom: -28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg-dim);
+  letter-spacing: 0.14em;
+}
+.m-showreel-tri {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 8px;
+  border-color: transparent transparent transparent var(--accent);
+}
+
+/* On phones the showreel cue sits a touch tighter */
+@media (max-width: 640px) {
+  .m-showreel-cue { bottom: -24px; font-size: 10px; }
+}
+
+/* ============================================================
+   WORK GRID + CARDS  (homepage)
+   ============================================================ */
+
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+@media (max-width: 900px) {
+  .work-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+}
+@media (max-width: 560px) {
+  .work-grid { grid-template-columns: 1fr; gap: 24px; }
+}
+
+/* Each card is a button — strip the default button styling */
+.work-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--fg);
+}
+.work-card-frame {
+  position: relative;
+  overflow: hidden;
+}
+.work-card-frame > div { transition: transform 600ms cubic-bezier(.2,.8,.2,1); }
+.work-card:hover .work-card-frame > div { transform: scale(1.03); }
+
+.work-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 14px;
+}
+
+/* Play affordance on video cards */
+.work-card-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--kami);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--sumi) 40%, transparent);
+  backdrop-filter: blur(2px);
+  transition: transform 360ms cubic-bezier(.2,.8,.2,1), background-color 360ms ease;
+  pointer-events: none;
+}
+.work-card:hover .work-card-play {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: color-mix(in srgb, var(--accent) 75%, transparent);
+}
+.work-card-tri {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 0 8px 13px;
+  border-color: transparent transparent transparent var(--kami);
+  margin-left: 4px;
+}
+
+/* Tabs wrap cleanly on small screens */
+@media (max-width: 480px) {
+  .work-tabs { width: 100%; }
+  .work-tab { flex: 1; justify-content: center; }
+}
+
+/* ============================================================
+   LIGHTBOX
+   ============================================================ */
+
+.ml-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  background: color-mix(in srgb, var(--sumi) 92%, transparent);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 32px;
+  animation: fadein 240ms ease-out both;
+}
+@media (max-width: 640px) {
+  .ml-lightbox { padding: 72px 16px 32px; }
+}
+
+.ml-lightbox-close {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  background: transparent;
+  border: 1px solid var(--rule-strong);
+  color: var(--kami);
+  padding: 10px 16px;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+.ml-lightbox-close:hover { background: var(--kami); color: var(--sumi); }
+
+.ml-lightbox-stage {
+  width: 100%;
+  max-width: 1100px;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.ml-lightbox-frame {
+  background: #000;
+  max-height: 78vh;
+  overflow: hidden;
+  display: flex;
+}
+.ml-lightbox-frame > * { width: 100%; }
+.ml-lightbox-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   SERVICES STRIP + CONTACT CARDS
+   ============================================================ */
+
+@media (max-width: 600px) {
+  .services-strip { gap: 10px 0 !important; }
+}
+
+/* Contact action cards — big email + WhatsApp blocks */
+.contact-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 36px 32px;
+  border: 1px solid var(--rule-strong);
+  color: var(--fg);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 200px;
+  justify-content: space-between;
+  transition: border-color 200ms ease;
+}
+.contact-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: translateY(101%);
+  transition: transform 460ms cubic-bezier(.7,0,.25,1);
+  z-index: -1;
+}
+.contact-card:hover { border-color: var(--accent); }
+.contact-card:hover::before { transform: translateY(0); }
+.contact-card:hover,
+.contact-card:hover .contact-card-kicker,
+.contact-card:hover .contact-card-go { color: var(--kami); }
+
+.contact-card-kicker {
+  color: var(--fg-dim);
+  letter-spacing: 0.16em;
+  transition: color 200ms ease;
+}
+.contact-card-value {
+  font-size: clamp(24px, 3.4vw, 38px);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+}
+.contact-card-go {
+  letter-spacing: 0.14em;
+  color: var(--fg-dim);
+  transition: color 200ms ease;
+}
+
+@media (max-width: 560px) {
+  .contact-card { min-height: 0; padding: 28px 24px; }
+}

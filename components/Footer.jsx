@@ -1,6 +1,6 @@
 "use client";
 
-// Footer — editorial, with FancyLink hovers throughout.
+// Footer — editorial, trimmed to match the two-page structure.
 
 import { LogoLockup } from "@/components/Logo";
 import { FancyLink } from "@/components/Anim";
@@ -20,12 +20,12 @@ export function Footer() {
       }}
     >
       <div className="frame" style={{ paddingTop: 64, paddingBottom: 28 }}>
-        {/* Big monogram row */}
+        {/* Top row */}
         <div
-          className="r-cols-4"
+          className="r-cols-3"
           style={{
             display: "grid",
-            gridTemplateColumns: "1.2fr 1fr 1fr 1fr",
+            gridTemplateColumns: "1.4fr 1fr 1fr",
             gap: 48,
             paddingBottom: 56,
           }}
@@ -43,7 +43,7 @@ export function Footer() {
                 fontWeight: 700,
               }}
             >
-              Build something memorable.
+              Got something to make?
             </h3>
             <a
               href="/contact"
@@ -55,8 +55,8 @@ export function Footer() {
             >
               <span className="ml-cta-bg" />
               <span className="ml-cta-rotor">
-                <span className="ml-cta-line">Start a project</span>
-                <span className="ml-cta-line">Send a brief</span>
+                <span className="ml-cta-line">Get in touch</span>
+                <span className="ml-cta-line">Let&apos;s talk</span>
               </span>
               <span className="ml-cta-arrow" />
             </a>
@@ -67,8 +67,6 @@ export function Footer() {
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 }}>
               {[
                 ["/", "Work"],
-                ["/services", "Services"],
-                ["/studio", "Studio"],
                 ["/contact", "Contact"],
               ].map(([href, label]) => (
                 <li key={href}>
@@ -87,17 +85,6 @@ export function Footer() {
           </div>
 
           <div>
-            <div className="eyebrow" style={{ marginBottom: 14 }}>Practice</div>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12, color: "var(--fg-dim)" }}>
-              <li>Identity systems</li>
-              <li>Motion &amp; film</li>
-              <li>Spatial &amp; signage</li>
-              <li>Packaging &amp; print</li>
-              <li>Digital product</li>
-            </ul>
-          </div>
-
-          <div>
             <div className="eyebrow" style={{ marginBottom: 14 }}>Contact</div>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 }}>
               <li>
@@ -106,16 +93,6 @@ export function Footer() {
               <li>
                 <FancyLink href="https://www.instagram.com/miyakolab.co" target="_blank" rel="noopener">
                   Instagram
-                </FancyLink>
-              </li>
-              <li>
-                <FancyLink href="https://uk.linkedin.com/in/alin-miyako" target="_blank" rel="noopener">
-                  LinkedIn
-                </FancyLink>
-              </li>
-              <li>
-                <FancyLink href="#" target="_blank" rel="noopener">
-                  Are.na
                 </FancyLink>
               </li>
             </ul>

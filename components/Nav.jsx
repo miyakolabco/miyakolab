@@ -1,6 +1,6 @@
 "use client";
 
-// Nav — fixed top, page switcher
+// Nav — fixed top, two routes.
 
 import { usePathname } from "next/navigation";
 import { LogoMark } from "@/components/Logo";
@@ -11,9 +11,7 @@ export function Nav() {
   const pathname = usePathname();
 
   const items = [
-    { href: "/", label: "Work", match: (p) => p === "/" || p.startsWith("/work") },
-    { href: "/services", label: "Services", match: (p) => p === "/services" },
-    { href: "/studio", label: "Studio", match: (p) => p === "/studio" },
+    { href: "/", label: "Work", match: (p) => p === "/" },
     { href: "/contact", label: "Contact", match: (p) => p === "/contact" },
   ];
 
@@ -115,8 +113,8 @@ export function Nav() {
         >
           <span className="ml-cta-bg" />
           <span className="ml-cta-rotor">
-            <span className="ml-cta-line">Start a project</span>
-            <span className="ml-cta-line">Send a brief</span>
+            <span className="ml-cta-line">Get in touch</span>
+            <span className="ml-cta-line">Let&apos;s talk</span>
           </span>
           <span className="ml-cta-arrow" />
         </a>

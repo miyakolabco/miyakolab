@@ -1,4 +1,22 @@
-// Shared bits — placeholder canvas, crop frame, etc.
+// Shared bits — placeholder canvas, crop frame, video slots, etc.
+
+// The M-mark silhouette, used both as a drawn logo and as a video mask.
+const M_MARK_PATHS =
+  '<path d="M142.43,218.71H94.88V102.04h47.55l66.45,114.91l66.45-114.91h47.55v213.67h-47.55V197.14l-39.02,70.97h-54.87l-39.01-70.97V218.71z M142.43,315.71H94.88v-47.55h47.55V315.71z"/>' +
+  '<path d="M370.43,102.04h47.55v116.19h-47.55V102.04z M417.98,47.55H274.86V0h143.11V47.55z"/>' +
+  '<path d="M218.56,370.21l0,47.55l-123.68,0l0-47.55L218.56,370.21z M0,417.76l0-149.59l47.55,0l0,149.59L0,417.76z"/>' +
+  '<rect x="0" y="2.82" width="49.11" height="99.22"/>' +
+  '<rect x="0" y="0" width="94.88" height="47.55"/>' +
+  '<rect x="370.32" y="315.71" width="47.44" height="101.34"/>' +
+  '<rect x="322.88" y="370.21" width="94.88" height="47.55"/>';
+
+const M_MASK_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 417.76 417.76"><g fill="#fff">' +
+  M_MARK_PATHS +
+  "</g></svg>";
+
+// data: URI of the M silhouette, for use as a CSS mask.
+export const M_MASK_URI = `url("data:image/svg+xml,${encodeURIComponent(M_MASK_SVG)}")`;
 
 export function CropFrame({ children, ratio = "16 / 10", style = {} }) {
   return (
@@ -6,6 +24,86 @@ export function CropFrame({ children, ratio = "16 / 10", style = {} }) {
       <span className="crop-tr" />
       <span className="crop-bl" />
       {children}
+    </div>
+  );
+}
+
+// MShowreel — the M mark used as a window onto a highlight reel.
+// Pass `src` (a video URL) to play footage inside the M shape.
+// With no src, it shows the textured M fill + a "showreel" cue — a clear
+// placeholder until real footage is dropped in.
+export function MShowreel({ src }) {
+  const maskStyle = {
+    WebkitMaskImage: M_MASK_URI,
+    maskImage: M_MASK_URI,
+    WebkitMaskRepeat: "no-repeat",
+    maskRepeat: "no-repeat",
+    WebkitMaskSize: "contain",
+    maskSize: "contain",
+    WebkitMaskPosition: "center",
+    maskPosition: "center",
+  };
+
+  return (
+    <div className="m-showreel" style={{ position: "relative", width: "100%", aspectRatio: "1 / 1" }}>
+      <div style={{ position: "absolute", inset: 0, ...maskStyle }}>
+        {src ? (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          >
+            <source src={src} />
+          </video>
+        ) : (
+          <div className="m-showreel-fill" style={{ width: "100%", height: "100%" }} />
+        )}
+      </div>
+      {!src && (
+        <div className="m-showreel-cue mono">
+          <span className="m-showreel-tri" />
+          Showreel — coming soon
+        </div>
+      )}
+    </div>
+  );
+}
+
+// VideoPlaceholder — a video-shaped slot with crop-mark chrome and a play
+// affordance. Pass `src` to swap in a real video; otherwise it's a clear
+// "video goes here" placeholder.
+export function VideoPlaceholder({
+  label,
+  caption,
+  ratio = "16 / 9",
+  tint = "ink",
+  pattern = "grain",
+  src,
+  style = {},
+}) {
+  return (
+    <div className="crop video-ph" style={{ aspectRatio: ratio, position: "relative", ...style }}>
+      <span className="crop-tr" />
+      <span className="crop-bl" />
+      {src ? (
+        <video
+          controls
+          playsInline
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        >
+          <source src={src} />
+        </video>
+      ) : (
+        <>
+          <MediaPlaceholder fill tint={tint} pattern={pattern} label={label} caption={caption} />
+          <div className="video-ph-play" aria-hidden="true">
+            <span className="video-ph-tri" />
+          </div>
+          <div className="video-ph-tag mono">▶ Video — placeholder</div>
+        </>
+      )}
     </div>
   );
 }

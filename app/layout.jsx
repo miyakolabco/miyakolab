@@ -6,13 +6,13 @@ import { Nav } from "@/components/Nav";
 import { CustomCursor, PageCurtain } from "@/components/Anim";
 
 export const metadata = {
-  title: "Miyako Lab — Identity, Motion, Matter",
+  title: "Miyako Lab — Video & Design Studio, Osaka",
   description:
-    "Miyako Lab is a multimedia design studio based in Osaka, making brand identity, motion, and spatial work for places that mostly exist after dark.",
+    "Miyako Lab is a multimedia design studio in Osaka — video, motion, flyers, menus, and print for hospitality and nightlife.",
   metadataBase: new URL("https://miyakolab.co"),
   openGraph: {
-    title: "Miyako Lab — Identity, Motion, Matter",
-    description: "A multimedia design studio rooted in Japan, working globally.",
+    title: "Miyako Lab — Video & Design Studio, Osaka",
+    description: "Video, motion, flyers, and print for places that mostly exist after dark.",
     type: "website",
   },
 };

@@ -1,25 +1,36 @@
 "use client";
 
-// Work — Index page (home route /)
-// Editorial list (left) + responsive preview window (right) that swaps on hover.
+// Work — the homepage. Portfolio-first:
+//   1. Hero (M-mask showreel + tagline)
+//   2. Compact services strip — what the studio does, no hard sell
+//   3. Categorised work grid (Video / Flyers / Print tabs)
+//   4. Tapping a piece opens it full-size in a lightbox
 
 import { useState } from "react";
-import { WORK } from "@/lib/work";
-import { BrandMarkLarge } from "@/components/Logo";
-import { WordReveal, MarqueeBelt } from "@/components/Anim";
-import { MediaPlaceholder } from "@/components/Shared";
+import { WORK, CATEGORIES, getWorkByCategory } from "@/lib/work";
+import { WordReveal, MarqueeBelt, Reveal } from "@/components/Anim";
+import { MediaPlaceholder, MShowreel } from "@/components/Shared";
+import { Lightbox } from "@/components/Lightbox";
 import { Footer } from "@/components/Footer";
-import { useNavigate } from "@/lib/navigation";
 
-export default function WorkIndex() {
-  const [hover, setHover] = useState(0);
-  const navigate = useNavigate();
-  const active = WORK[hover];
+// The short "what we do" list — informative, not a sales pitch.
+const SERVICES = [
+  "Video & motion",
+  "Flyers & social",
+  "Menus & print",
+  "Brand identity",
+];
+
+export default function WorkPage() {
+  const [activeCat, setActiveCat] = useState("video");
+  const [lightboxPiece, setLightboxPiece] = useState(null);
+
+  const pieces = getWorkByCategory(activeCat);
 
   return (
     <>
       <div className="page page-fade">
-        {/* ============ BRAND HERO ============ */}
+        {/* ============ HERO ============ */}
         <section
           style={{
             minHeight: "calc(100vh - 64px)",
@@ -28,11 +39,9 @@ export default function WorkIndex() {
             flexDirection: "column",
             justifyContent: "space-between",
             paddingTop: 96,
-            paddingBottom: 0,
             overflow: "hidden",
           }}
         >
-          {/* Top mono kicker line */}
           <div
             className="frame"
             style={{
@@ -50,7 +59,6 @@ export default function WorkIndex() {
             </span>
           </div>
 
-          {/* Center — big M mark + tagline + sub */}
           <div className="frame" style={{ padding: "48px 32px" }}>
             <div
               className="r-split"
@@ -60,12 +68,12 @@ export default function WorkIndex() {
                 alignItems: "center",
               }}
             >
-              {/* Animated M — draws in rect-by-rect */}
-              <div className="logo-draw" style={{ color: "var(--fg)" }}>
-                <BrandMarkLarge />
+              {/* The M mark as a window onto the studio showreel.
+                  Add a video: <MShowreel src="/showreel.mp4" /> */}
+              <div style={{ color: "var(--fg)" }}>
+                <MShowreel />
               </div>
 
-              {/* Tagline + sub */}
               <div>
                 <h1
                   className="display"
@@ -154,177 +162,181 @@ export default function WorkIndex() {
           </div>
         </section>
 
-        {/* ============ WORK INDEX ============ */}
-        <section className="frame" style={{ paddingTop: 96, paddingBottom: 40 }}>
-          <div
+        {/* ============ SERVICES STRIP ============ */}
+        {/* Compact — tells clients the range without a whole page of selling */}
+        <section className="frame" style={{ paddingTop: 80, paddingBottom: 24 }}>
+          <Reveal
+            className="services-strip"
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "baseline",
+              gap: "16px 40px",
+              paddingBottom: 28,
+              borderBottom: "1px solid var(--rule)",
+            }}
+          >
+            <span className="eyebrow" style={{ flexShrink: 0 }}>
+              What we do
+            </span>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 28px" }}>
+              {SERVICES.map((s, i) => (
+                <span
+                  key={s}
+                  className="display"
+                  style={{
+                    fontSize: "clamp(20px, 2.6vw, 30px)",
+                    letterSpacing: "-0.02em",
+                    color: i === 0 ? "var(--fg)" : "var(--fg)",
+                  }}
+                >
+                  {s}
+                  {i < SERVICES.length - 1 && (
+                    <span style={{ color: "var(--accent)", marginLeft: "28px" }}>/</span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </Reveal>
+        </section>
+
+        {/* ============ CATEGORISED WORK GRID ============ */}
+        <section className="frame" style={{ paddingTop: 40, paddingBottom: 80 }}>
+          {/* Heading + category tabs */}
+          <Reveal
             style={{
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "baseline",
-              gap: 32,
-              paddingBottom: 22,
-              borderBottom: "1px solid var(--rule)",
+              alignItems: "flex-end",
+              gap: 24,
               flexWrap: "wrap",
+              marginBottom: 36,
             }}
           >
-            <h2 className="display" style={{ fontSize: 40, margin: 0, letterSpacing: "-0.025em" }}>
+            <h2
+              className="display"
+              style={{ fontSize: "clamp(40px, 7vw, 72px)", margin: 0, letterSpacing: "-0.03em" }}
+            >
               Selected work.
             </h2>
-          </div>
-        </section>
 
-        {/* Index list + preview */}
-        <section className="frame" style={{ paddingBottom: 80 }}>
-          <div className="work-layout" style={{ display: "grid", gridTemplateColumns: "1.55fr 1fr", gap: 56 }}>
-            {/* Left — the table */}
-            <div>
-              <div
-                className="mono work-thead"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "60px 1.6fr 2.7fr 28px",
-                  gap: 14,
-                  padding: "14px 0",
-                  color: "var(--fg-dim)",
-                  borderTop: "1px solid var(--rule)",
-                  borderBottom: "1px solid var(--rule)",
-                }}
-              >
-                <span>N°</span>
-                <span>Project</span>
-                <span style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 0.85fr", gap: 14 }}>
-                  <span>Sector</span>
-                  <span>Location</span>
-                  <span>Year</span>
-                </span>
-                <span></span>
-              </div>
-
-              {WORK.map((w, i) => {
-                const isHover = hover === i;
+            <div className="work-tabs" style={{ display: "flex", gap: 8 }}>
+              {CATEGORIES.map((cat) => {
+                const active = cat.id === activeCat;
+                const count = WORK.filter((w) => w.category === cat.id).length;
                 return (
-                  <a
-                    key={w.id}
-                    href={`/work/${w.id}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate(`/work/${w.id}`, w.title);
-                    }}
-                    onMouseEnter={() => setHover(i)}
-                    className="work-row"
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCat(cat.id)}
+                    className="mono work-tab"
                     style={{
-                      display: "grid",
-                      gridTemplateColumns: "60px 1.6fr 2.7fr 28px",
-                      gap: 14,
-                      padding: "26px 0",
-                      borderBottom: "1px solid var(--rule)",
-                      alignItems: "baseline",
-                      color: "var(--fg)",
-                      background: isHover ? "color-mix(in srgb, var(--accent) 6%, transparent)" : "transparent",
-                      transition: "background 160ms ease",
-                      position: "relative",
+                      padding: "10px 16px",
+                      border: `1px solid ${active ? "var(--accent)" : "var(--rule-strong)"}`,
+                      background: active ? "var(--accent)" : "transparent",
+                      color: active ? "var(--kami)" : "var(--fg)",
+                      letterSpacing: "0.12em",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                      transition: "background 160ms ease, border-color 160ms ease, color 160ms ease",
                     }}
                   >
-                    <span className="mono" style={{ color: "var(--fg-dim)" }}>
-                      N° {w.n}
-                    </span>
-                    <span style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                      <span
-                        className="display"
-                        style={{ fontSize: 28, lineHeight: 1, letterSpacing: "-0.02em" }}
-                      >
-                        {w.title}
-                        {isHover && <span style={{ color: "var(--accent)", marginLeft: 10 }}>→</span>}
-                      </span>
-                      {isHover && (
-                        <span
-                          className="serif-it"
-                          style={{ color: "var(--fg-dim)", fontSize: 15, marginTop: 4 }}
-                        >
-                          {w.blurb}
-                        </span>
-                      )}
-                    </span>
-                    <span
-                      className="work-meta"
-                      style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 0.85fr", gap: 14 }}
-                    >
-                      <span className="mono" style={{ color: "var(--fg-dim)" }}>
-                        {w.sector}
-                      </span>
-                      <span className="mono" style={{ color: "var(--fg-dim)" }}>
-                        {w.location}
-                      </span>
-                      <span className="mono" style={{ color: "var(--fg-dim)" }}>
-                        {w.year}
-                      </span>
-                    </span>
-                    <span
-                      className="mono work-arrow"
-                      style={{
-                        color: isHover ? "var(--accent)" : "var(--fg-dim)",
-                        justifySelf: "end",
-                      }}
-                    >
-                      ↗
-                    </span>
-                  </a>
+                    {cat.label}
+                    <span style={{ opacity: 0.6 }}>{String(count).padStart(2, "0")}</span>
+                  </button>
                 );
               })}
             </div>
+          </Reveal>
 
-            {/* Right — sticky preview */}
-            <div className="work-preview" style={{ position: "relative" }}>
-              <div style={{ position: "sticky", top: 100 }}>
-                <div className="crop" style={{ position: "relative" }}>
-                  <span className="crop-tr" />
-                  <span className="crop-bl" />
-                  <div style={{ aspectRatio: "4 / 5", position: "relative" }}>
-                    <MediaPlaceholder
-                      fill
-                      label={active.title}
-                      caption={active.role}
-                      tint={active.tint}
-                      pattern={active.pattern}
-                    />
-                  </div>
-                </div>
+          {/* The grid — re-keyed on category so items re-reveal when you switch */}
+          <div key={activeCat} className="work-grid">
+            {pieces.map((piece, i) => {
+              const isVideo = piece.media?.type === "video";
+              return (
+                <Reveal key={piece.id} delay={i * 70}>
+                  <button
+                    className="work-card"
+                    onClick={() => setLightboxPiece(piece)}
+                    aria-label={`Open ${piece.title}`}
+                  >
+                    <div className="crop work-card-frame">
+                      <span className="crop-tr" />
+                      <span className="crop-bl" />
+                      <div
+                        style={{
+                          aspectRatio: isVideo ? "16 / 9" : "4 / 5",
+                          position: "relative",
+                        }}
+                      >
+                        {piece.media && piece.media.src && isVideo && (
+                          <video
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata"
+                            poster={piece.media.poster || undefined}
+                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                            onMouseEnter={(e) => e.currentTarget.play()}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.pause();
+                              e.currentTarget.currentTime = 0;
+                            }}
+                          >
+                            <source src={piece.media.src} />
+                          </video>
+                        )}
+                        {piece.media && piece.media.src && !isVideo && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={piece.media.src}
+                            alt={piece.title}
+                            style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                          />
+                        )}
+                        {(!piece.media || !piece.media.src) && (
+                          <MediaPlaceholder
+                            fill
+                            tint={piece.tint}
+                            pattern={piece.pattern}
+                            label={piece.title}
+                            caption={isVideo ? "Video" : "Artwork"}
+                          />
+                        )}
 
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "auto 1fr",
-                    rowGap: 10,
-                    columnGap: 16,
-                    marginTop: 22,
-                  }}
-                >
-                  <span className="mono" style={{ color: "var(--fg-dim)" }}>Client</span>
-                  <span>{active.title}</span>
-                  <span className="mono" style={{ color: "var(--fg-dim)" }}>Year</span>
-                  <span className="mono">{active.year}</span>
-                  <span className="mono" style={{ color: "var(--fg-dim)" }}>Role</span>
-                  <span>{active.role}</span>
-                  <span className="mono" style={{ color: "var(--fg-dim)" }}>Theme</span>
-                  <span className="mono" style={{ textTransform: "capitalize" }}>
-                    {active.theme} · Auto
-                  </span>
-                </div>
+                        {/* Play affordance on video cards */}
+                        {isVideo && (
+                          <div className="work-card-play" aria-hidden="true">
+                            <span className="work-card-tri" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
-                <button
-                  className="btn"
-                  onClick={() => navigate(`/work/${active.id}`, active.title)}
-                  style={{ marginTop: 22, width: "100%", justifyContent: "space-between" }}
-                >
-                  Open case study
-                  <span>→</span>
-                </button>
-              </div>
-            </div>
+                    <div className="work-card-meta">
+                      <span
+                        className="display"
+                        style={{ fontSize: 19, letterSpacing: "-0.015em", lineHeight: 1.15 }}
+                      >
+                        {piece.title}
+                      </span>
+                      <span className="mono" style={{ color: "var(--fg-dim)" }}>
+                        {[piece.client, piece.year].filter(Boolean).join(" · ")}
+                      </span>
+                    </div>
+                  </button>
+                </Reveal>
+              );
+            })}
           </div>
         </section>
       </div>
+
       <Footer />
+
+      {/* Full-size viewer */}
+      <Lightbox piece={lightboxPiece} onClose={() => setLightboxPiece(null)} />
     </>
   );
 }
