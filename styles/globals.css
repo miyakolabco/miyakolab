@@ -722,9 +722,13 @@ button { font-family: inherit; cursor: pointer; }
 .work-card-frame {
   position: relative;
   overflow: hidden;
+  background: #000;
 }
 .work-card-frame > div { transition: transform 600ms cubic-bezier(.2,.8,.2,1); }
 .work-card:hover .work-card-frame > div { transform: scale(1.03); }
+/* Vimeo iframes inside cards ignore pointer events — the card button
+   itself handles the click to open the lightbox */
+.work-card-frame iframe { pointer-events: none; }
 
 .work-card-meta {
   display: flex;
@@ -778,7 +782,7 @@ button { font-family: inherit; cursor: pointer; }
   position: fixed;
   inset: 0;
   z-index: 9500;
-  background: color-mix(in srgb, var(--sumi) 92%, transparent);
+  background: color-mix(in srgb, var(--sumi) 94%, transparent);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
@@ -787,13 +791,14 @@ button { font-family: inherit; cursor: pointer; }
   animation: fadein 240ms ease-out both;
 }
 @media (max-width: 640px) {
-  .ml-lightbox { padding: 72px 16px 32px; }
+  .ml-lightbox { padding: 64px 12px 24px; }
 }
 
 .ml-lightbox-close {
   position: absolute;
   top: 22px;
   right: 24px;
+  z-index: 2;
   background: transparent;
   border: 1px solid var(--rule-strong);
   color: var(--kami);
@@ -804,24 +809,116 @@ button { font-family: inherit; cursor: pointer; }
 }
 .ml-lightbox-close:hover { background: var(--kami); color: var(--sumi); }
 
+.ml-lightbox-count {
+  position: absolute;
+  top: 26px;
+  left: 24px;
+  z-index: 2;
+  color: var(--hai-2);
+  letter-spacing: 0.18em;
+}
+
 .ml-lightbox-stage {
-  width: 100%;
-  max-width: 1100px;
-  max-height: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
 }
 .ml-lightbox-frame {
   background: #000;
-  max-height: 78vh;
   overflow: hidden;
-  display: flex;
+  position: relative;
+  /* vertical 9:16 video — height-led so it fits the viewport */
 }
-.ml-lightbox-frame > * { width: 100%; }
+.ml-lightbox-frame.is-vertical {
+  height: min(78vh, 860px);
+  aspect-ratio: 9 / 16;
+}
+.ml-lightbox-frame.is-still {
+  height: min(78vh, 900px);
+  aspect-ratio: 4 / 5;
+}
+@media (max-width: 640px) {
+  .ml-lightbox-frame.is-vertical {
+    height: auto;
+    width: 100%;
+    max-height: 74vh;
+  }
+  .ml-lightbox-frame.is-still {
+    height: auto;
+    width: 100%;
+    max-height: 74vh;
+  }
+}
 .ml-lightbox-meta {
+  text-align: center;
+  max-width: 90vw;
+}
+
+/* Up / down nav arrows — vertical pair on the right edge (desktop) */
+.ml-lightbox-nav {
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  z-index: 2;
+}
+.ml-lightbox-arrow {
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--rule-strong);
+  background: transparent;
+  color: var(--kami);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 160ms ease, color 160ms ease, opacity 160ms ease;
+}
+.ml-lightbox-arrow:hover:not(:disabled) { background: var(--kami); color: var(--sumi); }
+.ml-lightbox-arrow:disabled { opacity: 0.3; cursor: default; }
+/* On touch screens the swipe gesture replaces the arrows */
+@media (max-width: 640px) {
+  .ml-lightbox-nav { display: none; }
+}
+
+/* One-time swipe hint */
+.ml-lightbox-hint {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--kami);
+  background: color-mix(in srgb, var(--sumi) 70%, transparent);
+  border: 1px solid var(--rule-strong);
+  padding: 10px 16px;
+  letter-spacing: 0.14em;
+  animation: hintPulse 3.2s ease-in-out both;
+}
+.ml-lightbox-hint-arrows {
+  color: var(--accent);
+  font-size: 14px;
+  animation: hintBob 1.1s ease-in-out infinite;
+}
+@keyframes hintPulse {
+  0% { opacity: 0; }
+  15% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes hintBob {
+  0%, 100% { transform: translateY(-2px); }
+  50% { transform: translateY(2px); }
 }
 
 /* ============================================================

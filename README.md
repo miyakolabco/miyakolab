@@ -35,12 +35,18 @@ Each piece is one entry. To add a piece, copy an existing entry and change
 the fields. Key fields:
 
 - `category` — `"video"`, `"flyers"`, or `"print"` (controls which tab it appears under)
-- `media` — for video: `{ type: "video", src: "/my-clip.mp4", poster: "/my-poster.jpg" }`
-            for image: `{ type: "image", src: "/my-flyer.jpg" }`
-- If you don't have the file yet, leave `src: ""` — a styled placeholder shows instead
+- `media` — three options:
+  - **Vimeo video:** `{ type: "vimeo", id: "1192188941" }` — the numeric ID
+    from the Vimeo URL (`vimeo.com/1192188941`). Vimeo hosts the file; it
+    plays inside the site's own frame with all Vimeo branding/chrome hidden.
+  - **Self-hosted video:** `{ type: "video", src: "/my-clip.mp4" }` — file in `public/`
+  - **Image (flyers/print):** `{ type: "image", src: "/my-flyer.jpg" }` — file in `public/`
+- If you don't have the media yet, use `{ type: "video" }` or `{ type: "image" }`
+  with no `id`/`src` — a styled placeholder shows instead.
 
-To use a real file: drop it into the `public/` folder in your repo, then
-reference it as `/filename.mp4` (the leading slash means "the public folder").
+Video pieces display as 9:16 vertical (cards and full-size viewer). Images
+display as 4:5. In the full-size viewer, visitors swipe up/down (or use
+arrow keys / scroll) to move through pieces in the same category.
 
 ### The homepage showreel
 

@@ -11,6 +11,7 @@ import { WORK, CATEGORIES, getWorkByCategory } from "@/lib/work";
 import { WordReveal, MarqueeBelt, Reveal } from "@/components/Anim";
 import { MediaPlaceholder, MShowreel } from "@/components/Shared";
 import { Lightbox } from "@/components/Lightbox";
+import { VimeoPlayer } from "@/components/VimeoPlayer";
 import { Footer } from "@/components/Footer";
 
 // The short "what we do" list — informative, not a sales pitch.
@@ -23,7 +24,7 @@ const SERVICES = [
 
 export default function WorkPage() {
   const [activeCat, setActiveCat] = useState("video");
-  const [lightboxPiece, setLightboxPiece] = useState(null);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   const pieces = getWorkByCategory(activeCat);
 
@@ -253,12 +254,18 @@ export default function WorkPage() {
           {/* The grid — re-keyed on category so items re-reveal when you switch */}
           <div key={activeCat} className="work-grid">
             {pieces.map((piece, i) => {
-              const isVideo = piece.media?.type === "video";
+              const mediaType = piece.media?.type;
+              // vimeo + self-hosted video are vertical 9:16; images are 4:5
+              const vertical = mediaType === "vimeo" || mediaType === "video";
+              const isVimeo = mediaType === "vimeo" && piece.media.id;
+              const isVideoFile = mediaType === "video" && piece.media.src;
+              const isImage = mediaType === "image" && piece.media.src;
+              const hasMedia = isVimeo || isVideoFile || isImage;
               return (
                 <Reveal key={piece.id} delay={i * 70}>
                   <button
                     className="work-card"
-                    onClick={() => setLightboxPiece(piece)}
+                    onClick={() => setLightboxIndex(i)}
                     aria-label={`Open ${piece.title}`}
                   >
                     <div className="crop work-card-frame">
@@ -266,11 +273,14 @@ export default function WorkPage() {
                       <span className="crop-bl" />
                       <div
                         style={{
-                          aspectRatio: isVideo ? "16 / 9" : "4 / 5",
+                          aspectRatio: vertical ? "9 / 16" : "4 / 5",
                           position: "relative",
                         }}
                       >
-                        {piece.media && piece.media.src && isVideo && (
+                        {isVimeo && (
+                          <VimeoPlayer id={piece.media.id} mode="background" />
+                        )}
+                        {isVideoFile && (
                           <video
                             muted
                             loop
@@ -287,7 +297,7 @@ export default function WorkPage() {
                             <source src={piece.media.src} />
                           </video>
                         )}
-                        {piece.media && piece.media.src && !isVideo && (
+                        {isImage && (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={piece.media.src}
@@ -295,18 +305,18 @@ export default function WorkPage() {
                             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                           />
                         )}
-                        {(!piece.media || !piece.media.src) && (
+                        {!hasMedia && (
                           <MediaPlaceholder
                             fill
                             tint={piece.tint}
                             pattern={piece.pattern}
                             label={piece.title}
-                            caption={isVideo ? "Video" : "Artwork"}
+                            caption={vertical ? "Video" : "Artwork"}
                           />
                         )}
 
                         {/* Play affordance on video cards */}
-                        {isVideo && (
+                        {vertical && (
                           <div className="work-card-play" aria-hidden="true">
                             <span className="work-card-tri" />
                           </div>
@@ -335,8 +345,13 @@ export default function WorkPage() {
 
       <Footer />
 
-      {/* Full-size viewer */}
-      <Lightbox piece={lightboxPiece} onClose={() => setLightboxPiece(null)} />
+      {/* Full-size viewer — swipe up/down through the active category */}
+      <Lightbox
+        pieces={pieces}
+        index={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onNavigate={(next) => setLightboxIndex(next)}
+      />
     </>
   );
 }

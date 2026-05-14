@@ -13,7 +13,7 @@ import { Footer } from "@/components/Footer";
 const EMAIL = "alin@miyakolab.co";
 // WhatsApp number in full international format, digits only (no +, spaces, dashes).
 // Example: UK mobile 07911 123456 → "447911123456"
-const WHATSAPP_NUMBER = "447911123456";
+const WHATSAPP_NUMBER = "817084991493";
 const WHATSAPP_PREFILL = "Hi Miyako Lab — I'd like to talk about a project.";
 const INSTAGRAM = "https://www.instagram.com/miyakolab.co";
 // ---------------------------------------------
