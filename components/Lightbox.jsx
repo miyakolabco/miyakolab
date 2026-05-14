@@ -77,6 +77,20 @@ function PagesViewer({ piece }) {
         ))}
       </div>
 
+      {/* Tap zones — left half = previous page, right half = next page */}
+      <button
+        className="ml-pages-tap ml-pages-tap-prev"
+        onClick={() => go(-1)}
+        disabled={page === 0}
+        aria-label="Previous page"
+      />
+      <button
+        className="ml-pages-tap ml-pages-tap-next"
+        onClick={() => go(1)}
+        disabled={page === srcs.length - 1}
+        aria-label="Next page"
+      />
+
       {/* Page dots */}
       <div className="ml-pages-dots" aria-hidden="true">
         {srcs.map((src, i) => (
@@ -103,6 +117,52 @@ function PagesViewer({ piece }) {
   );
 }
 
+// --- A website piece: screenshot in a browser-chrome frame + visit button ---
+function SiteFrame({ piece }) {
+  const { url, shot } = piece.media;
+  let host = url;
+  try {
+    host = new URL(url).host.replace(/^www\./, "");
+  } catch {}
+
+  return (
+    <div className="ml-site">
+      {/* Browser chrome */}
+      <div className="ml-site-chrome">
+        <span className="ml-site-dot" />
+        <span className="ml-site-dot" />
+        <span className="ml-site-dot" />
+        <div className="ml-site-url mono">{host}</div>
+      </div>
+      {/* Screenshot viewport — the shot scrolls slightly on hover */}
+      <div className="ml-site-shot">
+        {shot ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={shot} alt={piece.title} />
+        ) : (
+          <MediaPlaceholder
+            fill
+            tint={piece.tint}
+            pattern={piece.pattern}
+            label={piece.title}
+            caption="Screenshot — forthcoming"
+          />
+        )}
+      </div>
+      {/* Visit button */}
+      <a
+        className="ml-site-visit mono"
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        Visit site ↗
+      </a>
+    </div>
+  );
+}
+
 // --- Renders a single piece's media (active cell only mounts heavy media) ---
 function PieceMedia({ piece, active }) {
   const type = piece.media?.type;
@@ -110,9 +170,11 @@ function PieceMedia({ piece, active }) {
   const isVideoFile = type === "video" && piece.media.src;
   const isImage = type === "image" && piece.media.src;
   const isPages = type === "pages" && (piece.media.srcs || []).length > 0;
-  const hasMedia = isVimeo || isVideoFile || isImage || isPages;
-  // vimeo / video render 9:16; image renders 4:5; pages renders 16:9-ish landscape
-  const frameClass = isPages ? "is-pages" : isImage ? "is-still" : "is-vertical";
+  const isSite = type === "site" && piece.media.url;
+  const hasMedia = isVimeo || isVideoFile || isImage || isPages || isSite;
+  // vimeo / video render 9:16; image renders 4:5; pages + site render landscape
+  const frameClass =
+    isPages || isSite ? "is-pages" : isImage ? "is-still" : "is-vertical";
 
   return (
     <div className={`ml-lightbox-slide ${active ? "is-active" : ""}`}>
@@ -159,6 +221,8 @@ function PieceMedia({ piece, active }) {
             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
           />
         )}
+
+        {isSite && <SiteFrame piece={piece} />}
 
         {!hasMedia && (
           <MediaPlaceholder

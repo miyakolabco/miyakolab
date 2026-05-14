@@ -262,12 +262,15 @@ export default function WorkPage() {
           <div key={activeCat} className="work-grid">
             {pieces.map((piece, i) => {
               const mediaType = piece.media?.type;
-              // vimeo + self-hosted video are vertical 9:16; images are 4:5
+              // vimeo + self-hosted video are vertical 9:16; images are 4:5;
+              // sites render as a 4:5 browser-frame thumbnail
               const vertical = mediaType === "vimeo" || mediaType === "video";
               const isVimeo = mediaType === "vimeo" && piece.media.id;
               const isVideoFile = mediaType === "video" && piece.media.src;
               const isImage = mediaType === "image" && piece.media.src;
-              const hasMedia = isVimeo || isVideoFile || isImage;
+              const isPages = mediaType === "pages" && (piece.media.srcs || []).length > 0;
+              const isSite = mediaType === "site" && piece.media.url;
+              const hasMedia = isVimeo || isVideoFile || isImage || isPages || isSite;
               return (
                 <Reveal key={piece.id} delay={i * 70}>
                   <button
@@ -311,6 +314,39 @@ export default function WorkPage() {
                             alt={piece.title}
                             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                           />
+                        )}
+                        {isPages && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={piece.media.srcs[0]}
+                            alt={piece.title}
+                            style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }}
+                          />
+                        )}
+                        {isSite && (
+                          <div className="work-card-site">
+                            <div className="work-card-site-chrome">
+                              <span /><span /><span />
+                            </div>
+                            <div className="work-card-site-body">
+                              {piece.media.shot ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={piece.media.shot}
+                                  alt={piece.title}
+                                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
+                                />
+                              ) : (
+                                <MediaPlaceholder
+                                  fill
+                                  tint={piece.tint}
+                                  pattern={piece.pattern}
+                                  label={piece.title}
+                                  caption="Website"
+                                />
+                              )}
+                            </div>
+                          </div>
                         )}
                         {!hasMedia && (
                           <MediaPlaceholder

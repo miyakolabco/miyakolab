@@ -1001,6 +1001,128 @@ button { font-family: inherit; cursor: pointer; }
   .ml-pages-nav { display: none; }
 }
 
+/* Tap zones — left/right halves of the page viewer for prev/next */
+.ml-pages-tap {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 38%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 2;
+  /* sits under the dots/counter/nav (z-index 3) so those stay clickable */
+  -webkit-tap-highlight-color: transparent;
+}
+.ml-pages-tap-prev { left: 0; }
+.ml-pages-tap-next { right: 0; }
+.ml-pages-tap:disabled { cursor: default; }
+/* faint edge cue on hover (desktop) */
+.ml-pages-tap-prev:hover:not(:disabled) {
+  background: linear-gradient(to right, color-mix(in srgb, var(--sumi) 45%, transparent), transparent);
+}
+.ml-pages-tap-next:hover:not(:disabled) {
+  background: linear-gradient(to left, color-mix(in srgb, var(--sumi) 45%, transparent), transparent);
+}
+
+/* ---- Website piece — browser-chrome frame (lightbox) ---- */
+.ml-site {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--sumi);
+}
+.ml-site-chrome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #1a1a1a;
+  border-bottom: 1px solid var(--rule-strong);
+  flex: 0 0 auto;
+}
+.ml-site-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--hai-2);
+  flex: 0 0 auto;
+}
+.ml-site-url {
+  margin-left: 10px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--kami);
+  background: #0d0d0d;
+  padding: 5px 12px;
+  border-radius: 4px;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ml-site-shot {
+  flex: 1 1 auto;
+  position: relative;
+  overflow: hidden;
+}
+.ml-site-shot img {
+  width: 100%;
+  display: block;
+  /* the shot may be taller than the frame — slow-scroll it on hover */
+  transition: transform 4s ease;
+}
+.ml-site:hover .ml-site-shot img {
+  transform: translateY(calc(-100% + 360px));
+}
+.ml-site-visit {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 3;
+  background: var(--accent);
+  color: var(--kami);
+  padding: 11px 18px;
+  letter-spacing: 0.12em;
+  font-size: 12px;
+  text-decoration: none;
+  transition: transform 160ms ease, filter 160ms ease;
+}
+.ml-site-visit:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+}
+
+/* ---- Website piece — card thumbnail ---- */
+.work-card-site {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--sumi);
+}
+.work-card-site-chrome {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  background: #1a1a1a;
+  border-bottom: 1px solid var(--rule-strong);
+  flex: 0 0 auto;
+}
+.work-card-site-chrome span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--hai-2);
+}
+.work-card-site-body {
+  flex: 1 1 auto;
+  position: relative;
+  overflow: hidden;
+}
+
 /* Up / down nav — vertical pair on the right edge (items within a category) */
 .ml-lightbox-nav {
   position: absolute;
