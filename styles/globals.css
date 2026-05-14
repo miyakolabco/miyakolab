@@ -656,40 +656,64 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* --- M showreel: the M mark as a video window --- */
-.m-showreel { animation: fadein 600ms ease-out both; }
-.m-showreel-fill {
+.m-mark { animation: fadein 600ms ease-out both; }
+/* the live gradient fill inside the M shape */
+.m-mark-fill {
   background:
-    radial-gradient(120% 90% at 25% 20%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 60%),
-    radial-gradient(110% 80% at 85% 95%, color-mix(in srgb, var(--fg) 22%, transparent), transparent 55%),
+    radial-gradient(120% 90% at 25% 20%, color-mix(in srgb, var(--accent) 60%, transparent), transparent 60%),
+    radial-gradient(110% 80% at 85% 95%, color-mix(in srgb, var(--fg) 24%, transparent), transparent 55%),
     var(--fg);
-  background-size: 200% 200%, 200% 200%, 100% 100%;
-  animation: showreelDrift 14s ease-in-out infinite alternate;
+  background-size: 220% 220%, 220% 220%, 100% 100%;
+  /* backgroundPosition is driven inline by pointer/tilt; this just smooths it */
+  transition: background-position 280ms cubic-bezier(.2,.8,.2,1);
 }
-@keyframes showreelDrift {
-  from { background-position: 0% 0%, 100% 100%, 0 0; }
-  to   { background-position: 100% 60%, 0% 20%, 0 0; }
+/* faint twin behind the mark — parallax depth */
+.m-mark-ghost {
+  background: color-mix(in srgb, var(--accent) 26%, transparent);
+  filter: blur(2px);
 }
-.m-showreel-cue {
+/* crop-mark ticks on the mark, echoing the site chrome */
+.m-mark-tick {
   position: absolute;
-  left: 0;
-  bottom: -28px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--fg-dim);
-  letter-spacing: 0.14em;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
 }
-.m-showreel-tri {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 5px 0 5px 8px;
-  border-color: transparent transparent transparent var(--accent);
+.m-mark-tick-tl {
+  top: -6px;
+  left: -6px;
+  border-top: 1.5px solid var(--rule-strong);
+  border-left: 1.5px solid var(--rule-strong);
+}
+.m-mark-tick-br {
+  bottom: -6px;
+  right: -6px;
+  border-bottom: 1.5px solid var(--rule-strong);
+  border-right: 1.5px solid var(--rule-strong);
 }
 
-/* On phones the showreel cue sits a touch tighter */
-@media (max-width: 640px) {
-  .m-showreel-cue { bottom: -24px; font-size: 10px; }
+/* TypeCycle — cycling typed words with a blinking caret */
+.ml-typecycle {
+  display: inline-flex;
+  align-items: baseline;
+  min-height: 1em;
+}
+.ml-typecycle-caret {
+  display: inline-block;
+  width: 0.06em;
+  min-width: 3px;
+  height: 0.86em;
+  margin-left: 0.06em;
+  background: var(--accent);
+  align-self: center;
+  animation: caretBlink 1s steps(1) infinite;
+}
+@keyframes caretBlink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-typecycle-caret { animation: none; opacity: 1; }
 }
 
 /* ============================================================

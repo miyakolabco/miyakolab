@@ -1,15 +1,15 @@
 "use client";
 
 // Work — the homepage. Portfolio-first:
-//   1. Hero (M-mask showreel + tagline)
+//   1. Hero (interactive M-mark + cycling "we make" typing line)
 //   2. Compact services strip — what the studio does, no hard sell
-//   3. Categorised work grid (Video / Flyers / Print tabs)
+//   3. Categorised work grid (Video / Flyers / EPKs / Web tabs)
 //   4. Tapping a piece opens it full-size in a lightbox
 
 import { useState } from "react";
 import { WORK, CATEGORIES, getWorkByCategory } from "@/lib/work";
-import { WordReveal, MarqueeBelt, Reveal } from "@/components/Anim";
-import { MediaPlaceholder, MShowreel } from "@/components/Shared";
+import { WordReveal, MarqueeBelt, Reveal, TypeCycle } from "@/components/Anim";
+import { MediaPlaceholder, MMark } from "@/components/Shared";
 import { Lightbox } from "@/components/Lightbox";
 import { VimeoPlayer } from "@/components/VimeoPlayer";
 import { Footer } from "@/components/Footer";
@@ -71,36 +71,41 @@ export default function WorkPage() {
             <div
               className="r-split"
               style={{
-                "--split": "minmax(0, 1.05fr) minmax(0, 1.6fr)",
+                "--split": "minmax(0, 1fr) minmax(0, 1.5fr)",
                 gap: "clamp(24px, 4vw, 64px)",
                 alignItems: "center",
               }}
             >
-              {/* The M mark as a window onto the studio showreel.
-                  Add a video: <MShowreel src="/showreel.mp4" /> */}
+              {/* The M mark — cursor/tilt-reactive logo centrepiece */}
               <div style={{ color: "var(--fg)" }}>
-                <MShowreel />
+                <MMark />
               </div>
 
               <div>
                 <h1
                   className="display"
                   style={{
-                    fontSize: "clamp(56px, 9vw, 144px)",
+                    fontSize: "clamp(44px, 7vw, 104px)",
                     margin: 0,
-                    lineHeight: 0.92,
-                    letterSpacing: "-0.045em",
+                    lineHeight: 1.0,
+                    letterSpacing: "-0.04em",
                     fontWeight: 700,
                   }}
                 >
                   <span style={{ display: "block" }}>
-                    <WordReveal text="Identity," delay={350} />
-                  </span>
-                  <span style={{ display: "block" }}>
-                    <WordReveal text="motion," delay={500} />
+                    <WordReveal text="We make" delay={300} />
                   </span>
                   <span style={{ display: "block", color: "var(--accent)" }}>
-                    <WordReveal text="matter." delay={650} />
+                    <TypeCycle
+                      words={[
+                        "video.",
+                        "flyers.",
+                        "EPKs.",
+                        "websites.",
+                        "menus.",
+                        "motion.",
+                      ]}
+                    />
                   </span>
                 </h1>
 
@@ -114,8 +119,8 @@ export default function WorkPage() {
                   }}
                 >
                   <WordReveal
-                    text="Miyako Lab makes brand identity, motion, and spatial work for places that mostly exist after dark."
-                    delay={950}
+                    text="Miyako Lab is a multimedia design studio for places that mostly exist after dark."
+                    delay={650}
                     stagger={26}
                   />
                 </div>

@@ -1,5 +1,7 @@
 // Shared bits — placeholder canvas, crop frame, video slots, etc.
 
+import { useRef, useState, useEffect } from "react";
+
 // The M-mark silhouette, used both as a drawn logo and as a video mask.
 const M_MARK_PATHS =
   '<path d="M142.43,218.71H94.88V102.04h47.55l66.45,114.91l66.45-114.91h47.55v213.67h-47.55V197.14l-39.02,70.97h-54.87l-39.01-70.97V218.71z M142.43,315.71H94.88v-47.55h47.55V315.71z"/>' +
@@ -28,11 +30,77 @@ export function CropFrame({ children, ratio = "16 / 10", style = {} }) {
   );
 }
 
-// MShowreel — the M mark used as a window onto a highlight reel.
-// Pass `src` (a video URL) to play footage inside the M shape.
-// With no src, it shows the textured M fill + a "showreel" cue — a clear
-// placeholder until real footage is dropped in.
+// MShowreel — kept as a thin alias of MMark for backwards compatibility.
+// (If you ever want video back in the M, pass a `src` and it plays inside.)
 export function MShowreel({ src }) {
+  return <MMark src={src} />;
+}
+
+// MMark — the M-mark logo as an interactive centrepiece.
+// The M shape masks a living gradient "fill" that parallax-shifts toward the
+// cursor (desktop) or device tilt (mobile). A faint twin sits behind it and
+// shifts the opposite way, so the mark feels like it has depth.
+// Pass `src` (a video URL) to play footage inside the M instead of the fill.
+// MMark — the M-mark logo as an interactive centrepiece.
+// The M shape masks a living gradient "fill" that parallax-shifts toward the
+// cursor (desktop) or device tilt (mobile). A faint twin sits behind it and
+// shifts the opposite way, so the mark feels like it has depth.
+// Pass `src` (a video URL) to play footage inside the M instead of the fill.
+export function MMark({ src }) {
+  // shift state: -1..1 on each axis, eased toward the pointer/tilt
+  const wrapRef = useRef(null);
+  const [shift, setShift] = useState({ x: 0, y: 0 });
+  const target = useRef({ x: 0, y: 0 });
+  const raf = useRef(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    // Ease the rendered shift toward the target every frame — smooth, no jank
+    const tick = () => {
+      if (!mounted) return;
+      setShift((prev) => {
+        const nx = prev.x + (target.current.x - prev.x) * 0.08;
+        const ny = prev.y + (target.current.y - prev.y) * 0.08;
+        return { x: nx, y: ny };
+      });
+      raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+
+    // Desktop: pointer position relative to the mark's centre
+    const onMove = (e) => {
+      const el = wrapRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      // clamp to -1..1, scaled by viewport so far-away movement still registers
+      target.current = {
+        x: Math.max(-1, Math.min(1, (e.clientX - cx) / (window.innerWidth / 2))),
+        y: Math.max(-1, Math.min(1, (e.clientY - cy) / (window.innerHeight / 2))),
+      };
+    };
+
+    // Mobile: device tilt (gamma = left/right, beta = front/back)
+    const onTilt = (e) => {
+      if (e.gamma == null || e.beta == null) return;
+      target.current = {
+        x: Math.max(-1, Math.min(1, e.gamma / 35)),
+        y: Math.max(-1, Math.min(1, (e.beta - 45) / 35)),
+      };
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("deviceorientation", onTilt);
+    return () => {
+      mounted = false;
+      if (raf.current) cancelAnimationFrame(raf.current);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("deviceorientation", onTilt);
+    };
+  }, []);
+
   const maskStyle = {
     WebkitMaskImage: M_MASK_URI,
     maskImage: M_MASK_URI,
@@ -44,9 +112,28 @@ export function MShowreel({ src }) {
     maskPosition: "center",
   };
 
+  // foreground shifts toward pointer; background twin shifts away (parallax)
+  const fgShift = `translate(${shift.x * 14}px, ${shift.y * 14}px)`;
+  const bgShift = `translate(${shift.x * -22}px, ${shift.y * -22}px)`;
+  // the fill gradient also drifts within the mask for a liquid feel
+  const fillPos = `${50 + shift.x * 30}% ${50 + shift.y * 30}%`;
+
   return (
-    <div className="m-showreel" style={{ position: "relative", width: "100%", aspectRatio: "1 / 1" }}>
-      <div style={{ position: "absolute", inset: 0, ...maskStyle }}>
+    <div
+      ref={wrapRef}
+      className="m-mark"
+      style={{ position: "relative", width: "100%", aspectRatio: "1 / 1" }}
+    >
+      {/*背景 — faint twin, parallax behind */}
+      <div
+        className="m-mark-ghost"
+        style={{ position: "absolute", inset: 0, ...maskStyle, transform: bgShift }}
+      />
+
+      {/* Foreground — the live mark */}
+      <div
+        style={{ position: "absolute", inset: 0, ...maskStyle, transform: fgShift }}
+      >
         {src ? (
           <video
             autoPlay
@@ -58,15 +145,16 @@ export function MShowreel({ src }) {
             <source src={src} />
           </video>
         ) : (
-          <div className="m-showreel-fill" style={{ width: "100%", height: "100%" }} />
+          <div
+            className="m-mark-fill"
+            style={{ width: "100%", height: "100%", backgroundPosition: fillPos }}
+          />
         )}
       </div>
-      {!src && (
-        <div className="m-showreel-cue mono">
-          <span className="m-showreel-tri" />
-          Showreel — coming soon
-        </div>
-      )}
+
+      {/* Crop-mark accents, echoing the studio's chrome */}
+      <span className="m-mark-tick m-mark-tick-tl" />
+      <span className="m-mark-tick m-mark-tick-br" />
     </div>
   );
 }
