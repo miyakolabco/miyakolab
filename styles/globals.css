@@ -488,3 +488,124 @@ button { font-family: inherit; cursor: pointer; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--rule-strong); }
+
+/* ============================================================
+   RESPONSIVE — mobile & tablet
+   ============================================================
+   The design was authored desktop-first. These rules add the
+   breakpoints. Two breakpoints are used:
+     - 900px and below : tablet / large phone (two-col layouts stack)
+     - 640px and below : phone (tighter spacing, nav simplifies)
+   ============================================================ */
+
+/* Tighten the page gutter on small screens */
+@media (max-width: 900px) {
+  .frame { padding: 0 20px; }
+  .page { padding-top: 56px; }
+}
+
+/* --- r-split: a two-column content split that stacks when narrow ---
+   Set the desktop ratio inline with style={{ "--split": "1.4fr 1fr" }}.
+   Defaults to an even split if no ratio is given. */
+.r-split {
+  display: grid;
+  grid-template-columns: var(--split, 1fr 1fr);
+}
+@media (max-width: 900px) {
+  .r-split {
+    grid-template-columns: 1fr;
+    gap: 36px !important;
+  }
+}
+
+/* --- r-cols-2: an even pair (e.g. form fields) that stacks on phones --- */
+@media (max-width: 640px) {
+  .r-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* --- r-cols-3: a three-up grid → two on tablet → one on small phones --- */
+@media (max-width: 720px) {
+  .r-cols-3 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+@media (max-width: 460px) {
+  .r-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* --- r-cols-4: the footer's four columns → two on tablet → one on phone --- */
+@media (max-width: 900px) {
+  .r-cols-4 {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 36px !important;
+  }
+}
+@media (max-width: 560px) {
+  .r-cols-4 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* --- Nav: drop the CTA button on phones, tighten link spacing --- */
+@media (max-width: 640px) {
+  .ml-nav-cta { display: none !important; }
+  .ml-nav-links { gap: 0 !important; }
+  .ml-nav-links a { padding: 10px 9px !important; letter-spacing: 0.08em !important; }
+  .ml-nav-inner { gap: 12px !important; }
+}
+
+/* --- Work index table → stacked cards on phones --- */
+@media (max-width: 760px) {
+  /* Hide the desktop table header row */
+  .work-thead { display: none !important; }
+  /* Each row becomes a stacked card instead of a 6-column grid */
+  .work-row {
+    grid-template-columns: 1fr !important;
+    gap: 6px !important;
+    padding: 22px 0 !important;
+  }
+  /* The meta cells (sector / location / year) sit in a wrapping inline row */
+  .work-row .work-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  /* Hide the standalone arrow cell on mobile — the title carries its own */
+  .work-row .work-arrow { display: none !important; }
+  /* Hide the sticky preview panel on phones — the list works on its own */
+  .work-preview { display: none !important; }
+  .work-layout { grid-template-columns: 1fr !important; }
+}
+
+/* --- Case study sub-nav: hide the centre meta line on small screens --- */
+@media (max-width: 820px) {
+  .case-subnav-meta { display: none !important; }
+}
+@media (max-width: 520px) {
+  .case-subnav { height: auto !important; padding: 10px 0 !important; }
+  .case-subnav-inner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    height: auto !important;
+  }
+}
+
+/* --- Contact form: the chip rows stay wrapped (already flex-wrap),
+       but make sure the submit row stacks cleanly on phones --- */
+@media (max-width: 560px) {
+  .contact-submit-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 18px;
+  }
+}
+
+/* --- Generic: anything marked .r-hide-mobile disappears on phones --- */
+@media (max-width: 640px) {
+  .r-hide-mobile { display: none !important; }
+}

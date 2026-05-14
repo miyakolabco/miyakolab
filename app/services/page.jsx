@@ -91,9 +91,9 @@ export default function Services() {
             Three disciplines, one practice.
           </h1>
           <div
+            className="r-split"
             style={{
-              display: "grid",
-              gridTemplateColumns: "1.4fr 1fr",
+              "--split": "1.4fr 1fr",
               gap: 56,
               marginTop: 56,
               paddingTop: 36,
@@ -130,7 +130,7 @@ export default function Services() {
               borderBottom: i < SECTIONS.length - 1 ? "1px solid var(--rule)" : "none",
             }}
           >
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: 56 }}>
+            <div className="r-split" style={{ "--split": "1fr 1.4fr", gap: 56 }}>
               {/* Left — meta */}
               <div>
                 <div className="mono" style={{ color: "var(--fg-dim)", marginBottom: 18 }}>
@@ -139,7 +139,7 @@ export default function Services() {
                 <h2
                   className="display"
                   style={{
-                    fontSize: 64,
+                    fontSize: "clamp(38px, 5.5vw, 64px)",
                     margin: 0,
                     letterSpacing: "-0.03em",
                     lineHeight: 0.95,
@@ -199,7 +199,7 @@ export default function Services() {
                   <div className="eyebrow" style={{ marginBottom: 18 }}>
                     Selected · {s.kicker.toLowerCase()}
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+                  <div className="r-cols-3" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
                     {s.cases.map(([n, name, id]) => (
                       <a
                         key={id}
@@ -239,7 +239,7 @@ export default function Services() {
           className="frame"
           style={{ paddingTop: 96, paddingBottom: 120, borderTop: "1px solid var(--rule)" }}
         >
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.6fr", gap: 56 }}>
+          <div className="r-split" style={{ "--split": "1fr 1.6fr", gap: 56 }}>
             <h2
               className="display"
               style={{ fontSize: "clamp(36px, 4vw, 56px)", margin: 0, letterSpacing: "-0.025em", maxWidth: 480 }}

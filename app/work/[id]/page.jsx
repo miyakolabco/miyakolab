@@ -23,6 +23,7 @@ export default function CaseStudyPage() {
       <div className="page page-fade">
         {/* Sub-nav */}
         <div
+          className="case-subnav"
           style={{
             position: "sticky",
             top: 64,
@@ -33,7 +34,7 @@ export default function CaseStudyPage() {
           }}
         >
           <div
-            className="frame"
+            className="frame case-subnav-inner"
             style={{
               display: "flex",
               justifyContent: "space-between",
@@ -54,7 +55,7 @@ export default function CaseStudyPage() {
               </a>
               &nbsp;&nbsp;/&nbsp;&nbsp; N° {w.n}
             </div>
-            <div className="mono" style={{ color: "var(--fg-dim)", display: "flex", gap: 18 }}>
+            <div className="mono case-subnav-meta" style={{ color: "var(--fg-dim)", display: "flex", gap: 18 }}>
               <span>{w.title}</span>
               <span>·</span>
               <span>{w.sector}</span>
@@ -96,9 +97,9 @@ export default function CaseStudyPage() {
             {w.title}.
           </h1>
           <div
+            className="r-split"
             style={{
-              display: "grid",
-              gridTemplateColumns: "1.4fr 1fr",
+              "--split": "1.4fr 1fr",
               gap: 56,
               marginTop: 36,
               paddingTop: 28,
@@ -152,12 +153,12 @@ export default function CaseStudyPage() {
           className="frame"
           style={{ paddingTop: 80, paddingBottom: 96, borderTop: "1px solid var(--rule)" }}
         >
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 56 }}>
+          <div className="r-split" style={{ "--split": "1fr 2fr", gap: 56 }}>
             <div className="eyebrow">Press kit · Status</div>
             <div>
               <h2
                 className="display"
-                style={{ fontSize: 56, margin: 0, letterSpacing: "-0.025em", maxWidth: 820 }}
+                style={{ fontSize: "clamp(36px, 5.5vw, 56px)", margin: 0, letterSpacing: "-0.025em", maxWidth: 820 }}
               >
                 The full case study is{" "}
                 <em className="serif-it" style={{ color: "var(--fg-dim)" }}>
@@ -186,6 +187,7 @@ export default function CaseStudyPage() {
               </p>
 
               <div
+                className="r-cols-2"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(2, 1fr)",
@@ -260,7 +262,7 @@ export default function CaseStudyPage() {
               }}
               style={{ color: "var(--fg)" }}
             >
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "center" }}>
+              <div className="r-split" style={{ "--split": "1fr 1fr", gap: 48, alignItems: "center" }}>
                 <h3
                   className="display"
                   style={{

@@ -22,6 +22,7 @@ export function Footer() {
       <div className="frame" style={{ paddingTop: 64, paddingBottom: 28 }}>
         {/* Big monogram row */}
         <div
+          className="r-cols-4"
           style={{
             display: "grid",
             gridTemplateColumns: "1.2fr 1fr 1fr 1fr",
@@ -36,7 +37,7 @@ export function Footer() {
             <h3
               className="display"
               style={{
-                fontSize: 44,
+                fontSize: "clamp(32px, 5vw, 44px)",
                 margin: "0 0 24px",
                 maxWidth: 460,
                 fontWeight: 700,

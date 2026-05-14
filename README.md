@@ -139,6 +139,7 @@ You'll need [Node.js](https://nodejs.org) installed (download the LTS version).
 
 ## Notes
 
+- The site is **responsive** — it adapts to phones, tablets, and desktops. The layout breakpoints live at the bottom of `styles/globals.css` under the "RESPONSIVE" heading.
 - The site uses Geist, Space Mono, Newsreader, and Noto Sans JP from Google Fonts — loaded automatically.
 - Project images are currently stylized SVG placeholders. To use real photos, drop them in the `public/` folder and update the `MediaPlaceholder` calls to use `<img src="/your-image.jpg">` instead.
 - The custom cursor only shows on devices with a real mouse — touchscreens see the regular cursor.

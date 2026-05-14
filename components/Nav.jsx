@@ -33,6 +33,7 @@ export function Nav() {
       }}
     >
       <div
+        className="ml-nav-inner"
         style={{
           maxWidth: 1480,
           margin: "0 auto",
@@ -57,6 +58,7 @@ export function Nav() {
         </a>
 
         <ul
+          className="ml-nav-links"
           style={{
             display: "flex",
             gap: 4,
@@ -109,7 +111,7 @@ export function Nav() {
             e.preventDefault();
             navigate("/contact", "Contact");
           }}
-          className="ml-cta"
+          className="ml-cta ml-nav-cta"
         >
           <span className="ml-cta-bg" />
           <span className="ml-cta-rotor">

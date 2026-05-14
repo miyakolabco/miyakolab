@@ -35,7 +35,7 @@ export default function Studio() {
             borderTop: "1px solid var(--rule)",
           }}
         >
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 56 }}>
+          <div className="r-split" style={{ "--split": "1fr 2fr", gap: 56 }}>
             <div>
               <div
                 className="jp"
@@ -72,7 +72,7 @@ export default function Studio() {
 
         {/* Founder */}
         <section className="frame" style={{ paddingTop: 0, paddingBottom: 96 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: 56, alignItems: "center" }}>
+          <div className="r-split" style={{ "--split": "1fr 1.4fr", gap: 56, alignItems: "center" }}>
             <div style={{ aspectRatio: "4 / 5" }}>
               <MediaPlaceholder
                 fill
@@ -84,7 +84,7 @@ export default function Studio() {
             </div>
             <div style={{ maxWidth: 640 }}>
               <div className="eyebrow" style={{ marginBottom: 16 }}>Founder</div>
-              <h2 className="display" style={{ fontSize: 56, margin: 0, letterSpacing: "-0.03em", lineHeight: 1 }}>
+              <h2 className="display" style={{ fontSize: "clamp(40px, 6vw, 56px)", margin: 0, letterSpacing: "-0.03em", lineHeight: 1 }}>
                 Alin Miyako.
               </h2>
               <div className="mono" style={{ marginTop: 12, color: "var(--fg-dim)" }}>
@@ -133,7 +133,7 @@ export default function Studio() {
               flexWrap: "wrap",
             }}
           >
-            <h2 className="display" style={{ fontSize: 56, margin: 0, letterSpacing: "-0.03em" }}>
+            <h2 className="display" style={{ fontSize: "clamp(40px, 6vw, 56px)", margin: 0, letterSpacing: "-0.03em" }}>
               Press &amp; recognition.
             </h2>
             <div className="mono" style={{ color: "var(--fg-dim)" }}>[ Add real entries ]</div>
@@ -180,12 +180,13 @@ export default function Studio() {
                 flexWrap: "wrap",
               }}
             >
-              <h2 className="display" style={{ fontSize: 44, margin: 0, letterSpacing: "-0.03em" }}>
+              <h2 className="display" style={{ fontSize: "clamp(34px, 5vw, 44px)", margin: 0, letterSpacing: "-0.03em" }}>
                 Selected clients.
               </h2>
               <div className="mono" style={{ color: "var(--fg-dim)" }}>[ Add real names ]</div>
             </div>
             <div
+              className="r-cols-3"
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(3, 1fr)",

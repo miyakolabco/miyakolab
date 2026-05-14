@@ -64,7 +64,7 @@ export default function Contact() {
           className="frame"
           style={{ paddingTop: 56, paddingBottom: 96, borderTop: "1px solid var(--rule)" }}
         >
-          <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 72 }}>
+          <div className="r-split" style={{ "--split": "1.6fr 1fr", gap: 72 }}>
             {!submitted ? (
               <form
                 onSubmit={(e) => {
@@ -86,7 +86,7 @@ export default function Contact() {
                 </FormGroup>
 
                 <FormGroup n="04" label="You">
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <div className="r-cols-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <Field
                       label="Full name"
                       value={form.name}
@@ -116,7 +116,7 @@ export default function Contact() {
                     placeholder="Opening a 24-seat bar in Soho. Need everything from the name to the menu to the matchbook. Doors Sept '26."
                     style={inputStyle({ height: "auto", padding: "16px 0", resize: "vertical" })}
                   />
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <div className="r-cols-2" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                     <Field
                       label="Open date"
                       value={form.when}
@@ -137,6 +137,7 @@ export default function Contact() {
                 </FormGroup>
 
                 <div
+                  className="contact-submit-row"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",

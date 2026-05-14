@@ -53,9 +53,9 @@ export default function WorkIndex() {
           {/* Center — big M mark + tagline + sub */}
           <div className="frame" style={{ padding: "48px 32px" }}>
             <div
+              className="r-split"
               style={{
-                display: "grid",
-                gridTemplateColumns: "minmax(0, 1.05fr) minmax(0, 1.6fr)",
+                "--split": "minmax(0, 1.05fr) minmax(0, 1.6fr)",
                 gap: "clamp(24px, 4vw, 64px)",
                 alignItems: "center",
               }}
@@ -175,14 +175,14 @@ export default function WorkIndex() {
 
         {/* Index list + preview */}
         <section className="frame" style={{ paddingBottom: 80 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1.55fr 1fr", gap: 56 }}>
+          <div className="work-layout" style={{ display: "grid", gridTemplateColumns: "1.55fr 1fr", gap: 56 }}>
             {/* Left — the table */}
             <div>
               <div
-                className="mono"
+                className="mono work-thead"
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "60px 1.6fr 1.2fr 0.8fr 0.7fr 28px",
+                  gridTemplateColumns: "60px 1.6fr 2.7fr 28px",
                   gap: 14,
                   padding: "14px 0",
                   color: "var(--fg-dim)",
@@ -192,9 +192,11 @@ export default function WorkIndex() {
               >
                 <span>N°</span>
                 <span>Project</span>
-                <span>Sector</span>
-                <span>Location</span>
-                <span>Year</span>
+                <span style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 0.85fr", gap: 14 }}>
+                  <span>Sector</span>
+                  <span>Location</span>
+                  <span>Year</span>
+                </span>
                 <span></span>
               </div>
 
@@ -209,9 +211,10 @@ export default function WorkIndex() {
                       navigate(`/work/${w.id}`, w.title);
                     }}
                     onMouseEnter={() => setHover(i)}
+                    className="work-row"
                     style={{
                       display: "grid",
-                      gridTemplateColumns: "60px 1.6fr 1.2fr 0.8fr 0.7fr 28px",
+                      gridTemplateColumns: "60px 1.6fr 2.7fr 28px",
                       gap: 14,
                       padding: "26px 0",
                       borderBottom: "1px solid var(--rule)",
@@ -242,17 +245,22 @@ export default function WorkIndex() {
                         </span>
                       )}
                     </span>
-                    <span className="mono" style={{ color: "var(--fg-dim)" }}>
-                      {w.sector}
-                    </span>
-                    <span className="mono" style={{ color: "var(--fg-dim)" }}>
-                      {w.location}
-                    </span>
-                    <span className="mono" style={{ color: "var(--fg-dim)" }}>
-                      {w.year}
+                    <span
+                      className="work-meta"
+                      style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 0.85fr", gap: 14 }}
+                    >
+                      <span className="mono" style={{ color: "var(--fg-dim)" }}>
+                        {w.sector}
+                      </span>
+                      <span className="mono" style={{ color: "var(--fg-dim)" }}>
+                        {w.location}
+                      </span>
+                      <span className="mono" style={{ color: "var(--fg-dim)" }}>
+                        {w.year}
+                      </span>
                     </span>
                     <span
-                      className="mono"
+                      className="mono work-arrow"
                       style={{
                         color: isHover ? "var(--accent)" : "var(--fg-dim)",
                         justifySelf: "end",
@@ -266,7 +274,7 @@ export default function WorkIndex() {
             </div>
 
             {/* Right — sticky preview */}
-            <div style={{ position: "relative" }}>
+            <div className="work-preview" style={{ position: "relative" }}>
               <div style={{ position: "sticky", top: 100 }}>
                 <div className="crop" style={{ position: "relative" }}>
                   <span className="crop-tr" />
