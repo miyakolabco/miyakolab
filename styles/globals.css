@@ -837,6 +837,15 @@ button { font-family: inherit; cursor: pointer; }
   align-items: center;
   justify-content: center;
   gap: 16px;
+  /* inactive slides sit back slightly — gives the swipe depth */
+  transform: scale(0.92);
+  opacity: 0.55;
+  transition: transform 520ms cubic-bezier(.16,1.02,.3,1),
+              opacity 420ms ease;
+}
+.ml-lightbox-slide.is-active {
+  transform: scale(1);
+  opacity: 1;
 }
 .ml-lightbox-frame {
   background: #000;

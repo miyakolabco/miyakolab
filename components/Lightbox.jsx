@@ -20,7 +20,7 @@ function PieceMedia({ piece, active }) {
   const vertical = piece.media?.type === "vimeo" || piece.media?.type === "video";
 
   return (
-    <div className="ml-lightbox-slide">
+    <div className={`ml-lightbox-slide ${active ? "is-active" : ""}`}>
       <div className={`crop ml-lightbox-frame ${vertical ? "is-vertical" : "is-still"}`}>
         <span className="crop-tr" />
         <span className="crop-bl" />
@@ -177,7 +177,9 @@ export function Lightbox({ pieces, index, onClose, onNavigate }) {
   // The track is translated by: -(index * 100%) plus the live drag offset.
   const trackStyle = {
     transform: `translateY(calc(${-index * 100}% + ${drag}px))`,
-    transition: dragging ? "none" : "transform 460ms cubic-bezier(.2,.8,.2,1)",
+    transition: dragging
+      ? "none"
+      : "transform 520ms cubic-bezier(.16,1.02,.3,1)",
   };
 
   return (
