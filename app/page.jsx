@@ -8,8 +8,9 @@
 
 import { useState } from "react";
 import { WORK, CATEGORIES, getWorkByCategory } from "@/lib/work";
-import { WordReveal, MarqueeBelt, Reveal, TypeCycle } from "@/components/Anim";
-import { MediaPlaceholder, MMark } from "@/components/Shared";
+import { WordReveal, MarqueeBelt, Reveal } from "@/components/Anim";
+import { MediaPlaceholder } from "@/components/Shared";
+import { LogoMark } from "@/components/Logo";
 import { Lightbox } from "@/components/Lightbox";
 import { VimeoPlayer } from "@/components/VimeoPlayer";
 import { Footer } from "@/components/Footer";
@@ -39,7 +40,10 @@ export default function WorkPage() {
     <>
       <div className="page page-fade">
         {/* ============ HERO ============ */}
+        {/* Paper-toned (kami) — the page opens light, then descends into the
+            dark work gallery below. The light-to-dark shift is intentional. */}
         <section
+          data-theme="light"
           style={{
             minHeight: "calc(100vh - 64px)",
             position: "relative",
@@ -48,6 +52,8 @@ export default function WorkPage() {
             justifyContent: "space-between",
             paddingTop: 96,
             overflow: "hidden",
+            background: "var(--bg)",
+            color: "var(--fg)",
           }}
         >
           <div
@@ -67,65 +73,59 @@ export default function WorkPage() {
             </span>
           </div>
 
-          <div className="frame" style={{ padding: "48px 32px" }}>
-            <div
-              className="r-split"
-              style={{
-                "--split": "minmax(0, 1fr) minmax(0, 1.5fr)",
-                gap: "clamp(24px, 4vw, 64px)",
-                alignItems: "center",
-              }}
-            >
-              {/* The M mark — cursor/tilt-reactive logo centrepiece */}
-              <div style={{ color: "var(--fg)" }}>
-                <MMark />
-              </div>
+          <div className="frame" style={{ padding: "40px 32px 56px" }}>
 
-              <div>
-                <h1
-                  className="display"
-                  style={{
-                    fontSize: "clamp(44px, 7vw, 104px)",
-                    margin: 0,
-                    lineHeight: 1.0,
-                    letterSpacing: "-0.04em",
-                    fontWeight: 700,
-                  }}
-                >
-                  <span style={{ display: "block" }}>
-                    <WordReveal text="We make" delay={300} />
-                  </span>
-                  <span style={{ display: "block", color: "var(--accent)" }}>
-                    <TypeCycle
-                      words={[
-                        "video.",
-                        "flyers.",
-                        "EPKs.",
-                        "websites.",
-                        "menus.",
-                        "motion.",
-                      ]}
-                    />
-                  </span>
-                </h1>
+            {/* ════════════════════════════════════════════════════════════
+                VERSION A — M-mark IS the "M" in the Miyako wordmark.
+                The logo is load-bearing: it spells the studio name.
+                ════════════════════════════════════════════════════════════ */}
+            <div className="hero-version" data-label="Version A — logo as letter">
+              <h1 className="hero-wordmark display">
+                <LogoMark
+                  className="hero-wordmark-m"
+                  aria-hidden="true"
+                  size={undefined}
+                />
+                <span className="hero-wordmark-rest">iyako</span>
+                <span className="hero-wordmark-lab">Lab</span>
+              </h1>
+              <p className="hero-dry">
+                <WordReveal
+                  text="We make venues worth leaving the house for."
+                  delay={300}
+                  stagger={24}
+                />
+              </p>
+              {/* Plain keyword line — small + muted, but real text for SEO */}
+              <p className="hero-seo">
+                Video production, event flyers, DJ EPKs &amp; websites — a
+                multimedia design studio in Osaka, Japan.
+              </p>
+            </div>
 
-                <div
-                  style={{
-                    marginTop: 36,
-                    maxWidth: 540,
-                    fontSize: 18,
-                    lineHeight: 1.5,
-                    color: "var(--fg-dim)",
-                  }}
-                >
-                  <WordReveal
-                    text="Miyako Lab is a multimedia design studio for places that mostly exist after dark."
-                    delay={650}
-                    stagger={26}
-                  />
+            <div className="hero-divider" aria-hidden="true" />
+
+            {/* ════════════════════════════════════════════════════════════
+                VERSION B — hero copy sits INSIDE the M-mark's negative space.
+                The logo is the frame the words live in.
+                ════════════════════════════════════════════════════════════ */}
+            <div className="hero-version" data-label="Version B — text in negative space">
+              <div className="hero-negative">
+                <LogoMark className="hero-negative-mark" aria-hidden="true" size={undefined} />
+                <div className="hero-negative-copy">
+                  <span className="hero-negative-kicker mono">Miyako Lab</span>
+                  <span className="hero-negative-dry display">
+                    Worth leaving
+                    <br />
+                    the house for.
+                  </span>
+                  <span className="hero-seo">
+                    Video, flyers, DJ EPKs &amp; websites — Osaka.
+                  </span>
                 </div>
               </div>
             </div>
+
           </div>
 
           {/* Bottom: scroll cue + marquee */}

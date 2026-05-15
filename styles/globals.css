@@ -655,65 +655,128 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 10px;
 }
 
-/* --- M showreel: the M mark as a video window --- */
-.m-mark { animation: fadein 600ms ease-out both; }
-/* the live gradient fill inside the M shape */
-.m-mark-fill {
-  background:
-    radial-gradient(120% 90% at 25% 20%, color-mix(in srgb, var(--accent) 60%, transparent), transparent 60%),
-    radial-gradient(110% 80% at 85% 95%, color-mix(in srgb, var(--fg) 24%, transparent), transparent 55%),
-    var(--fg);
-  background-size: 220% 220%, 220% 220%, 100% 100%;
-  /* backgroundPosition is driven inline by pointer/tilt; this just smooths it */
-  transition: background-position 280ms cubic-bezier(.2,.8,.2,1);
+/* ============================================================
+   HERO — two M-mark integration versions (A + B), stacked.
+   Delete whichever .hero-version you don't keep.
+   ============================================================ */
+
+/* Each version is labelled in dev via a small corner tag */
+.hero-version {
+  position: relative;
 }
-/* faint twin behind the mark — parallax depth */
-.m-mark-ghost {
-  background: color-mix(in srgb, var(--accent) 26%, transparent);
-  filter: blur(2px);
-}
-/* crop-mark ticks on the mark, echoing the site chrome */
-.m-mark-tick {
+.hero-version::before {
+  content: attr(data-label);
   position: absolute;
-  width: 14px;
-  height: 14px;
-  pointer-events: none;
+  top: -10px;
+  left: 0;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.55;
 }
-.m-mark-tick-tl {
-  top: -6px;
-  left: -6px;
-  border-top: 1.5px solid var(--rule-strong);
-  border-left: 1.5px solid var(--rule-strong);
-}
-.m-mark-tick-br {
-  bottom: -6px;
-  right: -6px;
-  border-bottom: 1.5px solid var(--rule-strong);
-  border-right: 1.5px solid var(--rule-strong);
+.hero-divider {
+  height: 1px;
+  background: var(--rule);
+  margin: 72px 0;
 }
 
-/* TypeCycle — cycling typed words with a blinking caret */
-.ml-typecycle {
-  display: inline-flex;
+/* ---- Version A — M-mark as the "M" in the wordmark ---- */
+.hero-wordmark {
+  display: flex;
   align-items: baseline;
-  min-height: 1em;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 28px 0 0;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.9;
+  font-size: clamp(64px, 13vw, 196px);
+  color: var(--fg);
 }
-.ml-typecycle-caret {
-  display: inline-block;
-  width: 0.06em;
-  min-width: 3px;
-  height: 0.86em;
-  margin-left: 0.06em;
-  background: var(--accent);
-  align-self: center;
-  animation: caretBlink 1s steps(1) infinite;
+/* the mark sits on the baseline, sized to the cap height of the text */
+.hero-wordmark-m {
+  width: 0.82em;
+  height: 0.82em;
+  color: var(--fg);
+  flex: 0 0 auto;
+  /* nudge so the mark optically aligns with the lowercase that follows */
+  transform: translateY(0.04em);
 }
-@keyframes caretBlink {
-  0%, 50% { opacity: 1; }
-  50.01%, 100% { opacity: 0; }
+.hero-wordmark-rest {
+  /* tighten the join so [M]iyako reads as one word */
+  margin-left: -0.04em;
 }
-@media (prefers-reduced-motion: reduce) {
-  .ml-typecycle-caret { animation: none; opacity: 1; }
+.hero-wordmark-lab {
+  margin-left: 0.3em;
+  color: var(--accent);
+}
+.hero-dry {
+  margin: 28px 0 0;
+  font-size: clamp(18px, 2.4vw, 30px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  max-width: 18ch;
+  line-height: 1.2;
+}
+/* small, muted, but real crawlable text */
+.hero-seo {
+  margin: 18px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--fg-dim);
+  max-width: 52ch;
+}
+
+/* ---- Version B — copy inside the M-mark's negative space ---- */
+.hero-negative {
+  position: relative;
+  margin-top: 32px;
+  width: min(560px, 100%);
+  aspect-ratio: 1 / 1;
+}
+.hero-negative-mark {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* the mark is a pale ghost — the frame, not the focus */
+  color: color-mix(in srgb, var(--fg) 13%, transparent);
+}
+.hero-negative-copy {
+  /* sit in the open lower-right counter of the M */
+  position: absolute;
+  right: 0;
+  bottom: 6%;
+  width: 62%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.hero-negative-kicker {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.hero-negative-dry {
+  font-size: clamp(24px, 3.6vw, 46px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.0;
+  color: var(--fg);
+}
+.hero-negative .hero-seo {
+  margin-top: 6px;
+}
+@media (max-width: 640px) {
+  .hero-negative { width: 100%; aspect-ratio: 4 / 3; }
+  .hero-negative-copy {
+    width: 78%;
+    bottom: 4%;
+  }
 }
 
 /* ============================================================

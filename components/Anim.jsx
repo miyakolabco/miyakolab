@@ -229,7 +229,9 @@ export function TypeCycle({ words = [], typeMs = 70, deleteMs = 38, holdMs = 140
 
   return (
     <span className="ml-typecycle">
-      <span className="ml-typecycle-word">{text}</span>
+      {/* zero-width-space keeps the line at full height even when text is empty,
+          so deleting the last char never collapses the line for a frame */}
+      <span className="ml-typecycle-word">{text || "\u200b"}</span>
       <span className="ml-typecycle-caret" aria-hidden="true" />
     </span>
   );
