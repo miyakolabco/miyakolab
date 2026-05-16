@@ -24,6 +24,7 @@ function PagesViewer({ piece }) {
   const [page, setPage] = useState(0);
   const [drag, setDrag] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [showRotate, setShowRotate] = useState(false);
   const startY = useRef(null);
 
   const go = useCallback(
@@ -37,6 +38,26 @@ function PagesViewer({ piece }) {
   useEffect(() => {
     setPage(0);
   }, [piece.id]);
+
+  // EPK pages are landscape — prompt the visitor to rotate if their phone
+  // is held in portrait. The hint shows once and re-checks on orientation
+  // change; it disappears the moment the phone is turned.
+  useEffect(() => {
+    const check = () => {
+      const portrait =
+        typeof window !== "undefined" &&
+        window.innerWidth < 760 &&
+        window.innerHeight > window.innerWidth;
+      setShowRotate(portrait);
+    };
+    check();
+    window.addEventListener("resize", check);
+    window.addEventListener("orientationchange", check);
+    return () => {
+      window.removeEventListener("resize", check);
+      window.removeEventListener("orientationchange", check);
+    };
+  }, []);
 
   const onTouchStart = (e) => {
     startY.current = e.touches[0].clientY;
@@ -113,6 +134,17 @@ function PagesViewer({ piece }) {
         <button onClick={() => go(-1)} disabled={page === 0} aria-label="Previous page">↑</button>
         <button onClick={() => go(1)} disabled={page === srcs.length - 1} aria-label="Next page">↓</button>
       </div>
+
+      {/* Rotate-phone hint — EPK pages are landscape, so prompt a turn.
+          Vanishes the instant the phone is rotated. */}
+      {showRotate && (
+        <div className="ml-rotate-hint" aria-hidden="true">
+          <div className="ml-rotate-phone">
+            <span className="ml-rotate-phone-body" />
+          </div>
+          <div className="ml-rotate-label">Rotate your phone to view</div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1106,6 +1106,54 @@ button { font-family: inherit; cursor: pointer; }
   background: linear-gradient(to left, color-mix(in srgb, var(--sumi) 45%, transparent), transparent);
 }
 
+/* ---- Rotate-phone hint (EPK pages are landscape) ---- */
+.ml-rotate-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: color-mix(in srgb, var(--sumi) 88%, transparent);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+/* a little phone outline that rocks from portrait to landscape */
+.ml-rotate-phone {
+  width: 46px;
+  height: 78px;
+  border: 2.5px solid var(--kami);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: rotatePhone 2.4s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+.ml-rotate-phone-body {
+  width: 60%;
+  height: 70%;
+  background: color-mix(in srgb, var(--accent) 70%, transparent);
+  border-radius: 2px;
+}
+@keyframes rotatePhone {
+  0%, 28%   { transform: rotate(0deg); }
+  58%, 82%  { transform: rotate(-90deg); }
+  100%      { transform: rotate(0deg); }
+}
+.ml-rotate-label {
+  font-family: var(--f-mono);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--kami);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ml-rotate-phone { animation: none; transform: rotate(-90deg); }
+}
+
 /* ---- Website piece — browser-chrome frame (lightbox) ---- */
 .ml-site {
   position: absolute;
