@@ -55,11 +55,8 @@ export default function WorkPage() {
         >
           {/* Top labels */}
           <div
-            className="frame"
+            className="frame hero-toplabels"
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "baseline",
               color: "var(--fg-dim)",
             }}
           >

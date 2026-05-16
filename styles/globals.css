@@ -669,6 +669,24 @@ button { font-family: inherit; cursor: pointer; }
   padding: 64px 32px;
 }
 
+/* Top label row — spaced on desktop, stacked on mobile so the
+   two labels never collide with each other or the rotating mark */
+.hero-toplabels {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+}
+@media (max-width: 640px) {
+  .hero-toplabels {
+    flex-direction: column;
+    gap: 6px;
+    /* leave room on the right for the rotating mark */
+    padding-right: 84px;
+  }
+  .hero-toplabels .mono { font-size: 11px; }
+}
+
 /* The one kinetic element — a slowly rotating M-mark */
 .hero-mark {
   position: absolute;
@@ -733,13 +751,25 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 @media (max-width: 640px) {
-  .hero-main { padding: 40px 0; }
-  .hero-mark {
-    top: auto;
-    bottom: 100%;
-    right: 0;
+  .hero-main {
+    padding: 32px 0 8px;
   }
-  .hero-labels { gap: 28px; }
+  /* Mark sits inside the hero, top-right, fully on-screen */
+  .hero-mark {
+    top: 0;
+    right: 0;
+    width: 68px;
+    height: 68px;
+  }
+  /* statement: smaller ceiling so it doesn't dwarf the screen */
+  .hero-statement {
+    font-size: clamp(40px, 12vw, 64px);
+    max-width: none;
+  }
+  .hero-labels {
+    gap: 22px;
+    margin-top: 36px;
+  }
   .hero-label { max-width: none; flex: 1 1 100%; }
 }
 
