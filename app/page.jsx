@@ -40,10 +40,9 @@ export default function WorkPage() {
     <>
       <div className="page page-fade">
         {/* ============ HERO ============ */}
-        {/* Paper-toned (kami) — the page opens light, then descends into the
-            dark work gallery below. The light-to-dark shift is intentional. */}
+        {/* monopo-inspired: one oversized statement line, tiny corner labels,
+            a single slowly-rotating kinetic mark, and lots of negative space. */}
         <section
-          data-theme="light"
           style={{
             minHeight: "calc(100vh - 64px)",
             position: "relative",
@@ -52,10 +51,9 @@ export default function WorkPage() {
             justifyContent: "space-between",
             paddingTop: 96,
             overflow: "hidden",
-            background: "var(--bg)",
-            color: "var(--fg)",
           }}
         >
+          {/* Top labels */}
           <div
             className="frame"
             style={{
@@ -73,59 +71,42 @@ export default function WorkPage() {
             </span>
           </div>
 
-          <div className="frame" style={{ padding: "40px 32px 56px" }}>
-
-            {/* ════════════════════════════════════════════════════════════
-                VERSION A — M-mark IS the "M" in the Miyako wordmark.
-                The logo is load-bearing: it spells the studio name.
-                ════════════════════════════════════════════════════════════ */}
-            <div className="hero-version" data-label="Version A — logo as letter">
-              <h1 className="hero-wordmark display">
-                <LogoMark
-                  className="hero-wordmark-m"
-                  aria-hidden="true"
-                  size={undefined}
-                />
-                <span className="hero-wordmark-rest">iyako</span>
-                <span className="hero-wordmark-lab">Lab</span>
-              </h1>
-              <p className="hero-dry">
-                <WordReveal
-                  text="We make venues worth leaving the house for."
-                  delay={300}
-                  stagger={24}
-                />
-              </p>
-              {/* Plain keyword line — small + muted, but real text for SEO */}
-              <p className="hero-seo">
-                Video production, event flyers, DJ EPKs &amp; websites — a
-                multimedia design studio in Osaka, Japan.
-              </p>
+          {/* Hero centre — statement line + rotating mark */}
+          <div className="frame hero-main">
+            {/* Slowly-rotating M-mark — the one kinetic element */}
+            <div className="hero-mark" aria-hidden="true">
+              <LogoMark className="hero-mark-spin" size={undefined} />
             </div>
 
-            <div className="hero-divider" aria-hidden="true" />
+            <h1 className="hero-statement display">
+              <WordReveal text="We design for" delay={250} stagger={70} />
+              <br />
+              <WordReveal text="places that live" delay={420} stagger={70} />
+              <br />
+              <span className="hero-statement-accent">
+                <WordReveal text="after dark." delay={620} stagger={70} />
+              </span>
+            </h1>
 
-            {/* ════════════════════════════════════════════════════════════
-                VERSION B — hero copy sits INSIDE the M-mark's negative space.
-                The logo is the frame the words live in.
-                ════════════════════════════════════════════════════════════ */}
-            <div className="hero-version" data-label="Version B — text in negative space">
-              <div className="hero-negative">
-                <LogoMark className="hero-negative-mark" aria-hidden="true" size={undefined} />
-                <div className="hero-negative-copy">
-                  <span className="hero-negative-kicker mono">Miyako Lab</span>
-                  <span className="hero-negative-dry display">
-                    Worth leaving
-                    <br />
-                    the house for.
-                  </span>
-                  <span className="hero-seo">
-                    Video, flyers, DJ EPKs &amp; websites — Osaka.
-                  </span>
-                </div>
+            {/* Tiny label columns — quiet, considered, and real SEO text */}
+            <div className="hero-labels">
+              <div className="hero-label">
+                <span className="mono hero-label-key">Based in</span>
+                <span className="hero-label-val">Osaka, Japan</span>
+              </div>
+              <div className="hero-label">
+                <span className="mono hero-label-key">What we do</span>
+                <span className="hero-label-val">
+                  Video, flyers, DJ EPKs &amp; websites
+                </span>
+              </div>
+              <div className="hero-label">
+                <span className="mono hero-label-key">For</span>
+                <span className="hero-label-val">
+                  Venues, promoters &amp; artists
+                </span>
               </div>
             </div>
-
           </div>
 
           {/* Bottom: scroll cue + marquee */}
@@ -160,15 +141,15 @@ export default function WorkPage() {
               <MarqueeBelt
                 gap={64}
                 items={[
-                  "Identity",
-                  "Motion",
-                  "Matter",
+                  "Video",
+                  "Flyers",
+                  "EPKs",
                   <span className="jp" style={{ color: "var(--accent)" }} key="kanji">都研</span>,
+                  "Web",
                   "Miyako Lab",
-                  "Osaka",
-                  "Identity",
-                  "Motion",
-                  "Matter",
+                  "Video",
+                  "Flyers",
+                  "EPKs",
                 ]}
               />
             </div>
