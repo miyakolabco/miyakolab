@@ -1154,6 +1154,62 @@ button { font-family: inherit; cursor: pointer; }
   .ml-rotate-phone { animation: none; transform: rotate(-90deg); }
 }
 
+/* ---- Vimeo custom controls (overlay-friendly) ---- */
+/* Brief play/pause icon flash on the centre of the video */
+.vimeo-flash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 78px;
+  height: 78px;
+  margin: -39px 0 0 -39px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--sumi) 55%, transparent);
+  color: var(--kami);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: vimeoFlash 480ms ease-out forwards;
+}
+.vimeo-flash svg {
+  width: 36px;
+  height: 36px;
+}
+@keyframes vimeoFlash {
+  0%   { opacity: 0; transform: scale(0.6); }
+  30%  { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0; transform: scale(1.15); }
+}
+
+/* Mute / unmute button — sits in the bottom-right */
+.vimeo-mute {
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  z-index: 4;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sumi) 65%, transparent);
+  color: var(--kami);
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+.vimeo-mute:hover {
+  background: var(--accent);
+  transform: scale(1.06);
+}
+.vimeo-mute svg {
+  width: 20px;
+  height: 20px;
+}
+
 /* ---- Website piece — browser-chrome frame (lightbox) ---- */
 .ml-site {
   position: absolute;
@@ -1223,33 +1279,96 @@ button { font-family: inherit; cursor: pointer; }
   filter: brightness(1.12);
 }
 
-/* ---- Website piece — card thumbnail ---- */
+/* ---- Website piece — card thumbnail (tilted browser on a red field) ---- */
 .work-card-site {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
   background: var(--sumi);
+}
+/* Colourful backdrop — sumi base with a soft red glow + a faint grid */
+.work-card-site-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 100% at 18% 0%, color-mix(in srgb, var(--accent) 70%, transparent), transparent 55%),
+    radial-gradient(140% 100% at 100% 100%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 60%),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--kami) 4%, transparent) 0 1px,
+      transparent 1px 36px
+    ),
+    var(--sumi);
+}
+/* The floating browser window — keeps the screenshot at native landscape ratio */
+.work-card-site-window {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 86%;
+  transform: translate(-50%, -50%) rotate(-3deg);
+  background: var(--sumi-2);
+  border: 1px solid var(--rule-strong);
+  box-shadow: 0 18px 40px -8px rgba(0,0,0,0.55),
+              0 4px 12px -2px rgba(0,0,0,0.45);
+  transition: transform 600ms cubic-bezier(.2,.8,.2,1);
+}
+.work-card:hover .work-card-site-window {
+  transform: translate(-50%, -50%) rotate(-1deg) scale(1.04);
 }
 .work-card-site-chrome {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 7px 10px;
-  background: #1a1a1a;
+  padding: 8px 11px;
+  background: #131313;
   border-bottom: 1px solid var(--rule-strong);
-  flex: 0 0 auto;
 }
 .work-card-site-chrome span {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--hai-2);
 }
-.work-card-site-body {
-  flex: 1 1 auto;
-  position: relative;
+.work-card-site-chrome span:first-child { background: var(--accent); }
+.work-card-site-screen {
+  /* landscape browser viewport — screenshot stays in its native ratio */
+  aspect-ratio: 16 / 10;
   overflow: hidden;
+  position: relative;
+}
+.work-card-site-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+/* Live tag in the corner — small, characterful */
+.work-card-site-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  background: color-mix(in srgb, var(--sumi) 75%, transparent);
+  border: 1px solid var(--rule-strong);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--kami);
+}
+.work-card-site-tag-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: liveDot 1.6s ease-in-out infinite;
+}
+@keyframes liveDot {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
 }
 
 /* Up / down nav — vertical pair on the right edge (items within a category) */

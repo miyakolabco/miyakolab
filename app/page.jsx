@@ -141,7 +141,7 @@ export default function WorkPage() {
                   "Video",
                   "Flyers",
                   "EPKs",
-                  <span className="jp" style={{ color: "var(--accent)" }} key="kanji">都研</span>,
+                  <span className="jp" style={{ color: "var(--accent)" }} key="kanji">都</span>,
                   "Web",
                   "Miyako Lab",
                   "Video",
@@ -308,26 +308,34 @@ export default function WorkPage() {
                         )}
                         {isSite && (
                           <div className="work-card-site">
-                            <div className="work-card-site-chrome">
-                              <span /><span /><span />
+                            {/* colourful backdrop — sumi field with a soft red glow */}
+                            <div className="work-card-site-bg" aria-hidden="true" />
+                            {/* tilted browser window floating on the field */}
+                            <div className="work-card-site-window">
+                              <div className="work-card-site-chrome">
+                                <span /><span /><span />
+                              </div>
+                              <div className="work-card-site-screen">
+                                {piece.media.shot ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img
+                                    src={piece.media.shot}
+                                    alt={piece.title}
+                                  />
+                                ) : (
+                                  <MediaPlaceholder
+                                    fill
+                                    tint={piece.tint}
+                                    pattern={piece.pattern}
+                                    label={piece.title}
+                                    caption="Website"
+                                  />
+                                )}
+                              </div>
                             </div>
-                            <div className="work-card-site-body">
-                              {piece.media.shot ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                  src={piece.media.shot}
-                                  alt={piece.title}
-                                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", display: "block" }}
-                                />
-                              ) : (
-                                <MediaPlaceholder
-                                  fill
-                                  tint={piece.tint}
-                                  pattern={piece.pattern}
-                                  label={piece.title}
-                                  caption="Website"
-                                />
-                              )}
+                            {/* tiny live tag in the corner */}
+                            <div className="work-card-site-tag mono" aria-hidden="true">
+                              <span className="work-card-site-tag-dot" /> Live
                             </div>
                           </div>
                         )}

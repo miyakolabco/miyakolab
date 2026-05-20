@@ -1,28 +1,32 @@
 "use client";
 
-// VimeoPlayer — embeds a Vimeo video with all Vimeo chrome stripped
-// (no logo, title, byline, or "watch later"/share buttons). It hosts the
-// file; the surrounding frame and styling are ours.
+// VimeoPlayer — embeds a Vimeo video with all Vimeo chrome stripped.
 //
-// `id` is the numeric Vimeo video ID (e.g. "1192188941").
-// Modes:
-//   background: muted autoplay loop, no controls — used for grid card previews
-//   player:     autoplay with our own tap-to-pause — used inside the lightbox
+// Player mode (lightbox): the iframe is its own browsing context, which
+// means a touch starting on the video is swallowed and never reaches the
+// lightbox's swipe handlers. A transparent overlay sits on top of the
+// iframe so swipes bubble up to the lightbox. To keep the visitor in
+// control of audio + play state, we provide our own controls on top of
+// the overlay:
+//   - centre tap = play/pause toggle, with a brief icon flash so the
+//     visitor sees it worked
+//   - bottom-right button = mute/unmute (browsers force autoplay muted,
+//     so this is the way the visitor turns sound on)
 //
-// Why the overlay (player mode): a Vimeo iframe is a separate browsing
-// context, so a touch that STARTS on the video is swallowed by the iframe
-// and never reaches the lightbox's swipe handlers. A transparent overlay
-// sits on top of the iframe — touch on a normal DOM element bubbles up to
-// the lightbox, so swipes work no matter where they start. A tap on the
-// overlay (no drag) toggles play/pause via Vimeo's postMessage API.
+// All control commands go to Vimeo via the postMessage Player API.
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function VimeoPlayer({ id, mode = "player" }) {
   const isBg = mode === "background";
   const iframeRef = useRef(null);
   const playingRef = useRef(true);
   const tapStart = useRef(null);
+  const lastTouchEnd = useRef(0);
+
+  // Visible state for our custom controls
+  const [muted, setMuted] = useState(true);
+  const [flash, setFlash] = useState(null); // "play" | "pause" | null
 
   // Vimeo player params — see https://developer.vimeo.com/player/sdk/embed
   const params = new URLSearchParams({
@@ -31,37 +35,36 @@ export function VimeoPlayer({ id, mode = "player" }) {
     byline: "0",
     title: "0",
     portrait: "0",
-    dnt: "1", // do not track
+    dnt: "1",
     ...(isBg
       ? {
-          background: "1", // hides all controls, autoplays, loops, muted
+          background: "1", // hides controls, autoplays muted + loops
         }
       : {
           autoplay: "1",
-          controls: "0", // we provide our own tap-to-pause
+          controls: "0", // ours, not theirs
+          muted: "1", // required for autoplay; user unmutes via our button
         }),
   });
 
   const src = `https://player.vimeo.com/video/${id}?${params.toString()}`;
 
-  // Send a command to the Vimeo player via postMessage
+  // postMessage helpers
   const post = (method, value) => {
     const win = iframeRef.current?.contentWindow;
-    if (win) {
-      win.postMessage(
-        JSON.stringify(value !== undefined ? { method, value } : { method }),
-        "https://player.vimeo.com"
-      );
-    }
+    if (!win) return;
+    win.postMessage(
+      JSON.stringify(value !== undefined ? { method, value } : { method }),
+      "https://player.vimeo.com"
+    );
   };
-
-  // On load, subscribe to the player's play/pause events
   const onIframeLoad = () => {
     post("addEventListener", "play");
     post("addEventListener", "pause");
+    post("addEventListener", "volumechange");
   };
 
-  // Keep playingRef in sync with the player's real state
+  // Sync local state with the real player
   useEffect(() => {
     if (isBg) return;
     const onMsg = (e) => {
@@ -73,13 +76,16 @@ export function VimeoPlayer({ id, mode = "player" }) {
         return;
       }
       if (data.event === "play") playingRef.current = true;
-      if (data.event === "pause") playingRef.current = false;
+      else if (data.event === "pause") playingRef.current = false;
+      else if (data.event === "volumechange" && data.data) {
+        setMuted(data.data.volume === 0);
+      }
     };
     window.addEventListener("message", onMsg);
     return () => window.removeEventListener("message", onMsg);
   }, [isBg]);
 
-  // Background mode — plain iframe, no overlay (cards aren't swipe targets)
+  // Background mode — no overlay, no controls
   if (isBg) {
     return (
       <iframe
@@ -92,16 +98,26 @@ export function VimeoPlayer({ id, mode = "player" }) {
     );
   }
 
-  // Player mode — iframe + transparent swipe/tap overlay.
-  // Tap (negligible movement) toggles play/pause; a drag is left to bubble
-  // up to the lightbox's swipe handlers.
-  const lastTouchEnd = useRef(0);
-
-  const togglePlay = () => {
-    post(playingRef.current ? "pause" : "play");
-    playingRef.current = !playingRef.current;
+  // Show a brief icon flash so taps feel responsive
+  const flashIcon = (kind) => {
+    setFlash(kind);
+    setTimeout(() => setFlash(null), 480);
   };
 
+  const togglePlay = () => {
+    const next = !playingRef.current;
+    post(next ? "play" : "pause");
+    playingRef.current = next;
+    flashIcon(next ? "play" : "pause");
+  };
+
+  const toggleMute = () => {
+    const next = !muted;
+    post("setVolume", next ? 0 : 1);
+    setMuted(next);
+  };
+
+  // Touch on the overlay — tap toggles play; swipe bubbles to the lightbox
   const onTouchStart = (e) => {
     const t = e.touches[0];
     tapStart.current = { x: t.clientX, y: t.clientY };
@@ -113,7 +129,6 @@ export function VimeoPlayer({ id, mode = "player" }) {
     const moved =
       Math.abs(t.clientX - tapStart.current.x) +
       Math.abs(t.clientY - tapStart.current.y);
-    // a real tap = barely moved; a swipe = moved, leave it for the lightbox
     if (moved < 12) togglePlay();
     tapStart.current = null;
   };
@@ -134,7 +149,8 @@ export function VimeoPlayer({ id, mode = "player" }) {
         referrerPolicy="strict-origin-when-cross-origin"
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, display: "block" }}
       />
-      {/* Transparent overlay — owns touch so swipes reach the lightbox */}
+
+      {/* Transparent swipe/tap overlay */}
       <div
         className="vimeo-swipe-overlay"
         onTouchStart={onTouchStart}
@@ -143,6 +159,44 @@ export function VimeoPlayer({ id, mode = "player" }) {
         style={{ position: "absolute", inset: 0, zIndex: 2, cursor: "pointer" }}
         aria-hidden="true"
       />
+
+      {/* Brief centre flash on play/pause so taps feel responsive */}
+      {flash && (
+        <div className="vimeo-flash" aria-hidden="true">
+          {flash === "play" ? (
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z" /></svg>
+          )}
+        </div>
+      )}
+
+      {/* Mute / unmute button — its own click target, doesn't toggle play */}
+      <button
+        type="button"
+        className="vimeo-mute"
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleMute();
+        }}
+        onTouchEnd={(e) => {
+          // stop the swipe/tap overlay from also handling this
+          e.stopPropagation();
+        }}
+        aria-label={muted ? "Unmute" : "Mute"}
+      >
+        {muted ? (
+          // muted = speaker with X
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.59 3L19 9.41 17.59 8 15 10.59 12.41 8 11 9.41 13.59 12 11 14.59 12.41 16 15 13.41 17.59 16 19 14.59 16.59 12z" />
+          </svg>
+        ) : (
+          // unmuted = speaker with waves
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05A4.5 4.5 0 0 0 16.5 12zM14 3.23v2.06A7 7 0 0 1 14 18.7v2.07A9 9 0 0 0 14 3.23z" />
+          </svg>
+        )}
+      </button>
     </>
   );
 }
