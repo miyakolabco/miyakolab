@@ -3,16 +3,14 @@
 // Lightbox — full-screen viewer with 2D TikTok-style navigation:
 //   vertical   = pieces within the current category (swipe up = next)
 //   horizontal = jump between categories (swipe right = next category)
-// Each swipe lands on the first piece of the target category.
+// Each horizontal swipe lands on the first piece of the target category.
 //
-// A "pages" media type (EPK / deck) opens a single grid cell but has its
-// OWN internal vertical page swipe — handled by PagesViewer below.
-//
-// Inputs:
-//   categories — [{ id, label }]
-//   workByCat  — { catId: [piece, ...] }
-//   pos        — { cat: <catIndex>, item: <itemIndex> } | null
-//   onClose, onNavigate(pos)
+// Special cases:
+//   - A "pages" media type (EPK / deck) has its OWN internal vertical
+//     page swipe — vertical lightbox gestures are disabled while open.
+//   - The Web category is rendered as ONE slide showing all 3 sites
+//     cascading as tilted browser windows — vertical nav is disabled.
+//   - Multi-finger touches bail out so the browser can pinch-zoom.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MediaPlaceholder } from "@/components/Shared";
@@ -26,6 +24,7 @@ function PagesViewer({ piece }) {
   const [dragging, setDragging] = useState(false);
   const [showRotate, setShowRotate] = useState(false);
   const startY = useRef(null);
+  const pinching = useRef(false);
 
   const go = useCallback(
     (dir) => {
@@ -40,8 +39,7 @@ function PagesViewer({ piece }) {
   }, [piece.id]);
 
   // EPK pages are landscape — prompt the visitor to rotate if their phone
-  // is held in portrait. The hint shows once and re-checks on orientation
-  // change; it disappears the moment the phone is turned.
+  // is held in portrait. The hint disappears the moment they turn it.
   useEffect(() => {
     const check = () => {
       const portrait =
@@ -59,17 +57,28 @@ function PagesViewer({ piece }) {
     };
   }, []);
 
+  // Multi-finger touches bail out so the browser can pinch-zoom.
   const onTouchStart = (e) => {
+    if (e.touches.length > 1) {
+      pinching.current = true;
+      return;
+    }
+    pinching.current = false;
     startY.current = e.touches[0].clientY;
     setDragging(true);
   };
   const onTouchMove = (e) => {
+    if (pinching.current || e.touches.length > 1) return;
     if (startY.current == null) return;
     let dy = e.touches[0].clientY - startY.current;
     if ((page === 0 && dy > 0) || (page === srcs.length - 1 && dy < 0)) dy *= 0.25;
     setDrag(dy);
   };
   const onTouchEnd = () => {
+    if (pinching.current) {
+      pinching.current = false;
+      return;
+    }
     setDragging(false);
     if (drag < -60) go(1);
     else if (drag > 60) go(-1);
@@ -93,7 +102,7 @@ function PagesViewer({ piece }) {
         {srcs.map((src, i) => (
           <div className="ml-pages-page" key={src}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt={`${piece.title} — page ${i + 1}`} />
+            <img src={src} alt={`${piece.title} — page ${i + 1}`} loading={i === 0 ? "eager" : "lazy"} decoding="async" />
           </div>
         ))}
       </div>
@@ -135,14 +144,14 @@ function PagesViewer({ piece }) {
         <button onClick={() => go(1)} disabled={page === srcs.length - 1} aria-label="Next page">↓</button>
       </div>
 
-      {/* Rotate-phone hint — EPK pages are landscape, so prompt a turn.
-          Vanishes the instant the phone is rotated. */}
+      {/* Rotate-phone hint — EPK pages are landscape */}
       {showRotate && (
         <div className="ml-rotate-hint" aria-hidden="true">
           <div className="ml-rotate-phone">
             <span className="ml-rotate-phone-body" />
           </div>
           <div className="ml-rotate-label">Rotate your phone to view</div>
+          <div className="ml-rotate-sublabel mono">Pinch to zoom in</div>
         </div>
       )}
     </div>
@@ -159,14 +168,12 @@ function SiteFrame({ piece }) {
 
   return (
     <div className="ml-site">
-      {/* Browser chrome */}
       <div className="ml-site-chrome">
         <span className="ml-site-dot" />
         <span className="ml-site-dot" />
         <span className="ml-site-dot" />
         <div className="ml-site-url mono">{host}</div>
       </div>
-      {/* Screenshot viewport — the shot scrolls slightly on hover */}
       <div className="ml-site-shot">
         {shot ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -181,7 +188,6 @@ function SiteFrame({ piece }) {
           />
         )}
       </div>
-      {/* Visit button */}
       <a
         className="ml-site-visit mono"
         href={url}
@@ -195,6 +201,71 @@ function SiteFrame({ piece }) {
   );
 }
 
+// --- The whole Web category as one cascading-windows showcase ---
+const COUNT_WORDS = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"];
+
+function SitesStack({ sites }) {
+  const n = sites.length;
+  const count = COUNT_WORDS[n] || String(n);
+  return (
+    <div className="ml-stack">
+      <div className="ml-stack-bg" aria-hidden="true" />
+
+      <div className="ml-stack-header">
+        <div className="mono ml-stack-kicker">Websites</div>
+        <div className="display ml-stack-title">
+          {count} {n === 1 ? "site" : "sites"}, live now.
+        </div>
+        <div className="mono ml-stack-hint">Tap any window to visit ↗</div>
+      </div>
+
+      <div className="ml-stack-windows">
+        {sites.map((piece, i) => {
+          const { url, shot } = piece.media;
+          let host = url;
+          try {
+            host = new URL(url).host.replace(/^www\./, "");
+          } catch {}
+          return (
+            <a
+              key={piece.id}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className={`ml-stack-window ml-stack-window-${i + 1}`}
+              aria-label={`Visit ${piece.title}`}
+            >
+              <div className="ml-stack-chrome">
+                <span /><span /><span />
+                <span className="ml-stack-url mono">{host}</span>
+              </div>
+              <div className="ml-stack-screen">
+                {shot ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={shot} alt={piece.title} loading="lazy" decoding="async" />
+                ) : (
+                  <MediaPlaceholder
+                    fill
+                    tint={piece.tint}
+                    pattern={piece.pattern}
+                    label={piece.title}
+                  />
+                )}
+              </div>
+              <div className="ml-stack-caption mono">
+                <span className="ml-stack-caption-title">{piece.title}</span>
+                {piece.client && <span className="ml-stack-caption-client">{piece.client}</span>}
+                <span className="ml-stack-caption-arrow">↗</span>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // --- Renders a single piece's media (active cell only mounts heavy media) ---
 function PieceMedia({ piece, active }) {
   const type = piece.media?.type;
@@ -204,7 +275,6 @@ function PieceMedia({ piece, active }) {
   const isPages = type === "pages" && (piece.media.srcs || []).length > 0;
   const isSite = type === "site" && piece.media.url;
   const hasMedia = isVimeo || isVideoFile || isImage || isPages || isSite;
-  // vimeo / video render 9:16; image renders 4:5; pages + site render landscape
   const frameClass =
     isPages || isSite ? "is-pages" : isImage ? "is-still" : "is-vertical";
 
@@ -286,16 +356,21 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
   const [dragX, setDragX] = useState(0);
   const [dragY, setDragY] = useState(0);
   const [dragging, setDragging] = useState(false);
-  const axis = useRef(null); // "x" | "y" — locked per gesture
+  const axis = useRef(null);
   const start = useRef(null);
+  const pinching = useRef(false);
   const wheelLock = useRef(false);
+  const closeRef = useRef(null);
 
   const catId = open ? categories[pos.cat].id : null;
   const pieces = open ? workByCat[catId] || [] : [];
   const piece = open ? pieces[pos.item] : null;
-  // Is the current piece a multi-page doc? If so, vertical gestures belong to
-  // ITS internal page swipe, so the lightbox only handles horizontal here.
   const pieceIsPages = piece?.media?.type === "pages";
+  const isWebCat = catId === "web";
+  // Vertical gestures inside the lightbox are disabled when the current
+  // slide owns vertical (multi-page docs) or when there's only one slide
+  // (web stack).
+  const lockVertical = pieceIsPages || isWebCat;
 
   const goItem = useCallback(
     (dir) => {
@@ -311,7 +386,7 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
       if (!open) return;
       const nextCat = pos.cat + dir;
       if (nextCat >= 0 && nextCat < categories.length) {
-        onNavigate({ cat: nextCat, item: 0 }); // land on first piece
+        onNavigate({ cat: nextCat, item: 0 });
       }
     },
     [open, pos, categories, onNavigate]
@@ -324,8 +399,8 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowRight") goCat(1);
       else if (e.key === "ArrowLeft") goCat(-1);
-      else if (e.key === "ArrowDown" && !pieceIsPages) goItem(1);
-      else if (e.key === "ArrowUp" && !pieceIsPages) goItem(-1);
+      else if (e.key === "ArrowDown" && !lockVertical) goItem(1);
+      else if (e.key === "ArrowUp" && !lockVertical) goItem(-1);
     };
     const onWheel = (e) => {
       if (wheelLock.current) return;
@@ -335,7 +410,7 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
         wheelLock.current = true;
         goCat(e.deltaX > 0 ? 1 : -1);
       } else {
-        if (pieceIsPages || Math.abs(e.deltaY) < 24) return;
+        if (lockVertical || Math.abs(e.deltaY) < 24) return;
         wheelLock.current = true;
         goItem(e.deltaY > 0 ? 1 : -1);
       }
@@ -345,13 +420,41 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("wheel", onWheel, { passive: true });
-    document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("wheel", onWheel);
-      document.body.style.overflow = "";
     };
-  }, [open, onClose, goItem, goCat, pieceIsPages]);
+  }, [open, onClose, goItem, goCat, lockVertical]);
+
+  // Lock the page behind the viewer. `overflow: hidden` alone isn't honoured
+  // by iOS Safari (the page still scrolls/bounces under your finger), so the
+  // body is pinned in place and restored to the same scroll position on close.
+  // Also moves keyboard focus into the dialog and hands it back afterwards.
+  useEffect(() => {
+    if (!open) return;
+    const body = document.body;
+    const scrollY = window.scrollY;
+    const previouslyFocused = document.activeElement;
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+    closeRef.current?.focus({ preventScroll: true });
+    return () => {
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      body.style.overflow = "";
+      window.scrollTo({ top: scrollY, behavior: "instant" });
+      if (previouslyFocused && typeof previouslyFocused.focus === "function") {
+        previouslyFocused.focus({ preventScroll: true });
+      }
+    };
+  }, [open]);
 
   // One-time hint
   useEffect(() => {
@@ -369,11 +472,18 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
 
   // --- Touch: lock to an axis once the gesture commits, then drag ---
   const onTouchStart = (e) => {
+    // Multi-finger gesture? Let the browser handle pinch-zoom.
+    if (e.touches.length > 1) {
+      pinching.current = true;
+      return;
+    }
+    pinching.current = false;
     start.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     axis.current = null;
     setDragging(true);
   };
   const onTouchMove = (e) => {
+    if (pinching.current || e.touches.length > 1) return;
     if (!start.current) return;
     const dx = e.touches[0].clientX - start.current.x;
     const dy = e.touches[0].clientY - start.current.y;
@@ -389,20 +499,23 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
       if ((pos.cat === 0 && dx > 0) || (pos.cat === categories.length - 1 && dx < 0)) d *= 0.25;
       setDragX(d);
     } else {
-      // vertical gesture on a multi-page piece belongs to its internal swipe
-      if (pieceIsPages) return;
+      if (lockVertical) return;
       let d = dy;
       if ((pos.item === 0 && dy > 0) || (pos.item === pieces.length - 1 && dy < 0)) d *= 0.25;
       setDragY(d);
     }
   };
   const onTouchEnd = () => {
+    if (pinching.current) {
+      pinching.current = false;
+      return;
+    }
     setDragging(false);
     const threshold = 70;
     if (axis.current === "x") {
       if (dragX < -threshold) goCat(1);
       else if (dragX > threshold) goCat(-1);
-    } else if (axis.current === "y" && !pieceIsPages) {
+    } else if (axis.current === "y" && !lockVertical) {
       if (dragY < -threshold) goItem(1);
       else if (dragY > threshold) goItem(-1);
     }
@@ -428,14 +541,14 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
       aria-modal="true"
       aria-label={piece?.title || "Work viewer"}
     >
-      <button className="ml-lightbox-close mono" onClick={onClose} aria-label="Close">
+      <button ref={closeRef} className="ml-lightbox-close mono" onClick={onClose} aria-label="Close">
         Close ✕
       </button>
 
       {/* Category label + item counter */}
       <div className="ml-lightbox-count mono">
         {categories[pos.cat].label}
-        {pieces.length > 1 && (
+        {!isWebCat && pieces.length > 1 && (
           <>
             {" — "}
             {String(pos.item + 1).padStart(2, "0")} / {String(pieces.length).padStart(2, "0")}
@@ -451,16 +564,16 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* Horizontal track — one column per category */}
         <div className="ml-lightbox-htrack" style={hStyle}>
           {categories.map((cat, ci) => {
             const catPieces = workByCat[cat.id] || [];
             const isCurrentCat = ci === pos.cat;
-            // Only the current category's vertical position is live; others rest at 0
-            const itemIndex = isCurrentCat ? pos.item : 0;
+            const isWeb = cat.id === "web";
+            // Web column has 1 slide; others use pos.item
+            const itemIndex = isWeb ? 0 : (isCurrentCat ? pos.item : 0);
             const vStyle = {
               transform: `translateY(calc(${-itemIndex * 100}% + ${
-                isCurrentCat && axis.current === "y" ? dragY : 0
+                isCurrentCat && axis.current === "y" && !lockVertical ? dragY : 0
               }px))`,
               transition:
                 dragging && isCurrentCat && axis.current === "y"
@@ -474,6 +587,12 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
                     <div className="ml-lightbox-slide is-active">
                       <div className="ml-lightbox-empty mono">
                         Nothing here yet — {cat.label.toLowerCase()} coming soon.
+                      </div>
+                    </div>
+                  ) : isWeb ? (
+                    <div className={`ml-lightbox-slide ${isCurrentCat ? "is-active" : ""}`}>
+                      <div className="ml-lightbox-frame is-stack">
+                        <SitesStack sites={catPieces} />
                       </div>
                     </div>
                   ) : (
@@ -492,7 +611,7 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
         </div>
       </div>
 
-      {/* Desktop nav — horizontal (categories) + vertical (items) */}
+      {/* Desktop nav — horizontal (categories) always; vertical hidden when locked */}
       <div className="ml-lightbox-nav-h" onClick={(e) => e.stopPropagation()}>
         <button onClick={() => goCat(-1)} disabled={pos.cat === 0} aria-label="Previous category">←</button>
         <button
@@ -503,7 +622,7 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
           →
         </button>
       </div>
-      {pieces.length > 1 && !pieceIsPages && (
+      {pieces.length > 1 && !lockVertical && (
         <div className="ml-lightbox-nav" onClick={(e) => e.stopPropagation()}>
           <button onClick={() => goItem(-1)} disabled={pos.item === 0} aria-label="Previous">↑</button>
           <button
@@ -516,7 +635,7 @@ export function Lightbox({ categories, workByCat, pos, onClose, onNavigate }) {
         </div>
       )}
 
-      {/* One-time hint — shows both axes */}
+      {/* One-time hint */}
       {showHint && (
         <div className="ml-lightbox-hint" aria-hidden="true">
           <div className="ml-hint-gesture">

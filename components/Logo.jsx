@@ -1,85 +1,36 @@
-// Inline SVG logos — color via currentColor. White on dark, Sumi on light.
+// Inline SVG logos — colour via currentColor. Kami on dark, Sumi on light.
+// The vector data lives in lib/brand.js so the favicon, Apple icon and
+// share image use exactly the same shapes.
+
+import { MARK_PATHS, MARK_VIEWBOX, LOCKUP_PATHS, LOCKUP_VIEWBOX } from "@/lib/brand";
 
 export function LogoLockup({ height = 28, style = {}, ...rest }) {
-  // Horizontal "MIYAKO LAB" lockup. ViewBox 1504.5 × 417.8
+  // Horizontal "MIYAKO LAB" lockup.
   return (
     <svg
-      viewBox="0 0 1504.5 417.8"
+      viewBox={LOCKUP_VIEWBOX}
       height={height}
       style={{ display: "block", fill: "currentColor", ...style }}
       aria-label="Miyako Lab"
+      role="img"
+      dangerouslySetInnerHTML={{ __html: LOCKUP_PATHS }}
       {...rest}
-    >
-      <rect x="94.9" y="268.2" width="47.5" height="47.5" />
-      <polygon points="322.9 315.7 322.9 102 275.3 102 208.9 217 142.4 102 94.9 102 94.9 218.7 142.4 218.7 142.4 197.1 181.4 268.1 236.3 268.1 275.3 197.1 275.3 315.7 322.9 315.7" />
-      <rect x="370.4" y="102" width="47.5" height="116.2" />
-      <rect x="274.9" width="143.1" height="47.6" />
-      <rect x="94.9" y="370.2" width="123.7" height="47.5" />
-      <rect y="268.2" width="47.5" height="149.6" />
-      <polygon points="94.9 47.6 94.9 0 0 0 0 2.8 0 47.6 0 102 49.1 102 49.1 47.6 94.9 47.6" />
-      <polygon points="370.3 370.2 322.9 370.2 322.9 417.8 417.8 417.8 417.8 417 417.8 370.2 417.8 315.7 370.3 315.7 370.3 370.2" />
-      <polygon points="664.2 184.1 664.2 0 623.2 0 566 99 508.7 0 467.8 0 467.8 107.4 508.7 107.4 508.7 107.4 508.7 81.9 542.3 140 589.6 140 623.2 81.9 623.2 184.1 664.2 184.1" />
-      <rect x="467.8" y="143.1" width="41" height="41" />
-      <rect x="698.3" width="41" height="184.1" />
-      <polygon points="879 184.1 879 101.1 820.7 0 773.4 0 838 112.1 838 184.1 879 184.1" />
-      <polygon points="934.9 0 887.7 0 863.2 42.3 910.5 42.3 934.9 0" />
-      <polygon points="990.9 0 1065.2 184.1 1109.3 184.1 1035 0 990.9 0" />
-      <polygon points="960.7 184.1 970.4 160.2 1016.3 160.2 1000 119.2 942.5 119.2 916.5 184.1 960.7 184.1" />
-      <rect x="1143.4" width="41" height="107.4" />
-      <rect x="1143.4" y="143.1" width="41" height="41" />
-      <polygon points="1302.6 0 1253.2 0 1195.7 84.8 1263.2 184.1 1312.5 184.1 1245 84.8 1302.6 0" />
-      <path d="M1412.3,184.1c50.9,0,92.2-41.2,92.2-91.9S1463.3,0,1412.3,0s-91.9,41.2-91.9,92.2,41.2,91.9,91.9,91.9ZM1412.3,41c28.4,0,51.2,22.8,51.2,51.2s-22.8,50.9-51.2,50.9-50.9-22.8-50.9-50.9,22.8-51.2,50.9-51.2Z" />
-      <rect x="467.8" y="232.4" width="41" height="107.4" />
-      <rect x="467.8" y="375.5" width="131.6" height="41" />
-      <polygon points="666 351.6 640 416.5 684.1 416.5 693.8 392.6 739.8 392.6 723.5 351.6 666 351.6" />
-      <polygon points="714.3 232.4 788.7 416.5 832.8 416.5 758.5 232.4 714.3 232.4" />
-      <path d="M966.2,232.4h0s-92.7,0-92.7,0v55.2h40.7v-14.2h52c12.1,0,12.3,8.1,12.3,12.6v8.1c0,4.2-.3,12.1-11,12.6h-94v41h94c10.8.5,11,8.4,11,12.6v2.6c0,4.5-.3,12.6-12.3,12.6h-21.3v41h21.3c49.1,0,53-40.4,53.3-51.2v-5s1-17.9-8.9-33.1c10-15.2,8.9-33.1,8.9-33.1v-8.1s3.4-53.6-53.3-53.6Z" />
-      <rect x="873.5" y="375.5" width="40.7" height="41" />
-      <rect x="1060.4" y="383.4" width="41" height="33.1" />
-      <path d="M1234,273.4c16.3,0,30.7,7.6,40.2,19.4l30.2-27.8c-16.8-20-42-32.6-70.4-32.5-50.7,0-91.9,41.2-91.9,91.9s41.2,92.2,91.9,92.2,51.7-11.8,68.5-30.5l-34.9-23.1c-8.9,7.9-20.7,12.6-33.6,12.6-28.1,0-50.9-22.8-50.9-51.2s22.8-51,50.9-51Z" />
-      <path d="M1410.8,232.4c-50.7,0-91.9,41.2-91.9,92.2s41.2,91.9,91.9,91.9,92.2-41.2,92.2-91.9-41.2-92.2-92.2-92.2ZM1410.8,375.5c-28.1,0-50.9-22.8-50.9-51s22.8-51.2,50.9-51.2c28.4,0,51.2,22.8,51.2,51.2s-22.8,51-51.2,51Z" />
-    </svg>
+    />
   );
 }
 
 export function LogoMark({ size = 32, style = {}, ...rest }) {
-  // The M-square mark, 417.76 × 417.76
+  // The M-square mark.
   return (
     <svg
-      viewBox="0 0 417.76 417.76"
+      viewBox={MARK_VIEWBOX}
       width={size}
       height={size}
       style={{ display: "block", fill: "currentColor", ...style }}
       aria-label="Miyako Lab mark"
+      role="img"
+      dangerouslySetInnerHTML={{ __html: MARK_PATHS }}
       {...rest}
-    >
-      <path d="M142.43,218.71H94.88V102.04h47.55l66.45,114.91l66.45-114.91h47.55v213.67h-47.55V197.14l-39.02,70.97h-54.87l-39.01-70.97V218.71z M142.43,315.71H94.88v-47.55h47.55V315.71z" />
-      <path d="M370.43,102.04h47.55v116.19h-47.55V102.04z M417.98,47.55H274.86V0h143.11V47.55z" />
-      <path d="M218.56,370.21l0,47.55l-123.68,0l0-47.55L218.56,370.21z M0,417.76l0-149.59l47.55,0l0,149.59L0,417.76z" />
-      <rect x="0" y="2.82" width="49.11" height="99.22" />
-      <rect x="0" y="0" width="94.88" height="47.55" />
-      <rect x="370.32" y="315.71" width="47.44" height="101.34" />
-      <rect x="322.88" y="370.21" width="94.88" height="47.55" />
-    </svg>
-  );
-}
-
-// Brand mark at hero scale — fills its parent. Used in homepage hero.
-export function BrandMarkLarge({ style = {}, ...rest }) {
-  return (
-    <svg
-      viewBox="0 0 417.76 417.76"
-      style={{ display: "block", width: "100%", height: "auto", fill: "currentColor", ...style }}
-      aria-label="Miyako Lab mark"
-      {...rest}
-    >
-      <path d="M142.43,218.71H94.88V102.04h47.55l66.45,114.91l66.45-114.91h47.55v213.67h-47.55V197.14l-39.02,70.97h-54.87l-39.01-70.97V218.71z M142.43,315.71H94.88v-47.55h47.55V315.71z" />
-      <path d="M370.43,102.04h47.55v116.19h-47.55V102.04z M417.98,47.55H274.86V0h143.11V47.55z" />
-      <path d="M218.56,370.21l0,47.55l-123.68,0l0-47.55L218.56,370.21z M0,417.76l0-149.59l47.55,0l0,149.59L0,417.76z" />
-      <rect x="0" y="2.82" width="49.11" height="99.22" />
-      <rect x="0" y="0" width="94.88" height="47.55" />
-      <rect x="370.32" y="315.71" width="47.44" height="101.34" />
-      <rect x="322.88" y="370.21" width="94.88" height="47.55" />
-    </svg>
+    />
   );
 }

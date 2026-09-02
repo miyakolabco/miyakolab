@@ -2,6 +2,7 @@
 
 // Footer — editorial, trimmed to match the two-page structure.
 
+import { SITE } from "@/lib/site";
 import { LogoLockup } from "@/components/Logo";
 import { FancyLink } from "@/components/Anim";
 import { useNavigate } from "@/lib/navigation";
@@ -88,10 +89,10 @@ export function Footer() {
             <div className="eyebrow" style={{ marginBottom: 14 }}>Contact</div>
             <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12 }}>
               <li>
-                <FancyLink href="mailto:alin@miyakolab.co">alin@miyakolab.co</FancyLink>
+                <FancyLink href={`mailto:${SITE.email}`}>{SITE.email}</FancyLink>
               </li>
               <li>
-                <FancyLink href="https://www.instagram.com/miyakolab.co" target="_blank" rel="noopener">
+                <FancyLink href={SITE.instagram} target="_blank" rel="noopener noreferrer">
                   Instagram
                 </FancyLink>
               </li>
@@ -134,7 +135,7 @@ export function Footer() {
           }}
         >
           <div className="mono" style={{ color: "var(--fg-dim)" }}>
-            © {year} &nbsp; Miyako Lab &nbsp;·&nbsp; All rights reserved.
+            © {year} &nbsp; {SITE.name} &nbsp;·&nbsp; All rights reserved.
           </div>
           <div
             className="mono"
@@ -143,7 +144,7 @@ export function Footer() {
               color: "var(--fg-dim)",
             }}
           >
-            <span className="jp">大阪</span> &nbsp;·&nbsp; Osaka, Japan
+            <span className="jp">{SITE.cityJp}</span> &nbsp;·&nbsp; {SITE.city}, {SITE.country}
           </div>
         </div>
       </div>

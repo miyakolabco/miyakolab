@@ -1,10 +1,10 @@
 "use client";
 
 // Work — the homepage. Portfolio-first:
-//   1. Hero (interactive M-mark + cycling "we make" typing line)
-//   2. Compact services strip — what the studio does, no hard sell
-//   3. Categorised work grid (Video / Flyers / EPKs / Web tabs)
-//   4. Tapping a piece opens it full-size in a lightbox
+//   1. Hero — one oversized statement, a slowly rotating M-mark, tiny labels
+//   2. Services strip — the full range in one line, no hard sell
+//   3. Categorised work grid (Video / Flyers / EPKs / Websites tabs)
+//   4. Tapping a piece opens it full-size in the swipe lightbox
 
 import { useState } from "react";
 import { WORK, CATEGORIES, getWorkByCategory } from "@/lib/work";
@@ -15,10 +15,13 @@ import { Lightbox } from "@/components/Lightbox";
 import { VimeoPlayer } from "@/components/VimeoPlayer";
 import { Footer } from "@/components/Footer";
 
-// The short "what we do" list — informative, not a sales pitch.
+// The full service list — informative, not a sales pitch.
+// Ordered by how much of the studio's work each one is.
 const SERVICES = [
   "Video & motion",
   "Flyers & social",
+  "DJ EPKs & decks",
+  "Websites",
   "Menus & print",
   "Brand identity",
 ];
@@ -38,28 +41,13 @@ export default function WorkPage() {
 
   return (
     <>
-      <div className="page page-fade">
+      <main className="page page-fade">
         {/* ============ HERO ============ */}
         {/* monopo-inspired: one oversized statement line, tiny corner labels,
             a single slowly-rotating kinetic mark, and lots of negative space. */}
-        <section
-          style={{
-            minHeight: "calc(100vh - 64px)",
-            position: "relative",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            paddingTop: 96,
-            overflow: "hidden",
-          }}
-        >
+        <section className="hero" aria-label="Introduction">
           {/* Top labels */}
-          <div
-            className="frame hero-toplabels"
-            style={{
-              color: "var(--fg-dim)",
-            }}
-          >
+          <div className="frame hero-toplabels">
             <span className="mono">
               <span style={{ color: "var(--accent)" }}>●</span> &nbsp; Multimedia design studio
             </span>
@@ -168,7 +156,7 @@ export default function WorkPage() {
             }}
           >
             <span className="eyebrow" style={{ flexShrink: 0 }}>
-              What we do
+              Services
             </span>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 28px" }}>
               {SERVICES.map((s, i) => (
@@ -178,7 +166,7 @@ export default function WorkPage() {
                   style={{
                     fontSize: "clamp(20px, 2.6vw, 30px)",
                     letterSpacing: "-0.02em",
-                    color: i === 0 ? "var(--fg)" : "var(--fg)",
+                    color: "var(--fg)",
                   }}
                 >
                   {s}
@@ -211,7 +199,7 @@ export default function WorkPage() {
               Selected work.
             </h2>
 
-            <div className="work-tabs" style={{ display: "flex", gap: 8 }}>
+            <div className="work-tabs" style={{ display: "flex", gap: 8 }} role="tablist" aria-label="Work categories">
               {CATEGORIES.map((cat) => {
                 const active = cat.id === activeCat;
                 const count = WORK.filter((w) => w.category === cat.id).length;
@@ -220,6 +208,8 @@ export default function WorkPage() {
                     key={cat.id}
                     onClick={() => setActiveCat(cat.id)}
                     className="mono work-tab"
+                    role="tab"
+                    aria-selected={active}
                     style={{
                       padding: "10px 16px",
                       border: `1px solid ${active ? "var(--accent)" : "var(--rule-strong)"}`,
@@ -233,7 +223,8 @@ export default function WorkPage() {
                       transition: "background 160ms ease, border-color 160ms ease, color 160ms ease",
                     }}
                   >
-                    {cat.label}
+                    <span className="work-tab-long">{cat.label}</span>
+                    <span className="work-tab-short">{cat.short || cat.label}</span>
                     <span style={{ opacity: 0.6 }}>{String(count).padStart(2, "0")}</span>
                   </button>
                 );
@@ -295,6 +286,8 @@ export default function WorkPage() {
                           <img
                             src={piece.media.src}
                             alt={piece.title}
+                            loading="lazy"
+                            decoding="async"
                             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                           />
                         )}
@@ -303,6 +296,8 @@ export default function WorkPage() {
                           <img
                             src={piece.media.srcs[0]}
                             alt={piece.title}
+                            loading="lazy"
+                            decoding="async"
                             style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top", display: "block" }}
                           />
                         )}
@@ -321,6 +316,8 @@ export default function WorkPage() {
                                   <img
                                     src={piece.media.shot}
                                     alt={piece.title}
+                                    loading="lazy"
+                                    decoding="async"
                                   />
                                 ) : (
                                   <MediaPlaceholder
@@ -375,7 +372,7 @@ export default function WorkPage() {
             })}
           </div>
         </section>
-      </div>
+      </main>
 
       <Footer />
 

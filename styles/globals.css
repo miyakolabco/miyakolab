@@ -660,6 +660,18 @@ button { font-family: inherit; cursor: pointer; }
    mark, tiny corner labels, generous negative space.
    ============================================================ */
 
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  padding-top: 96px;
+  min-height: calc(100vh - 64px);
+  /* svh = the viewport with the browser bars showing. On iOS, 100vh is
+     taller than what's visible, which pushed the scroll cue off-screen. */
+  min-height: calc(100svh - 64px);
+}
 .hero-main {
   position: relative;
   flex: 1 1 auto;
@@ -676,13 +688,12 @@ button { font-family: inherit; cursor: pointer; }
   justify-content: space-between;
   align-items: baseline;
   gap: 16px;
+  color: var(--fg-dim);
 }
 @media (max-width: 640px) {
   .hero-toplabels {
     flex-direction: column;
     gap: 6px;
-    /* leave room on the right for the rotating mark */
-    padding-right: 84px;
   }
   .hero-toplabels .mono { font-size: 11px; }
 }
@@ -751,26 +762,36 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 @media (max-width: 640px) {
+  .hero {
+    padding-top: 72px;
+    min-height: calc(100vh - 56px);
+    min-height: calc(100svh - 56px);
+  }
+  /* Keep the page gutter — an earlier rule zeroed it, which is why the
+     statement and labels sat flush against the left edge of the screen. */
   .hero-main {
-    padding: 32px 0 8px;
+    padding: 20px 20px 12px;
   }
-  /* Mark sits inside the hero, top-right, fully on-screen */
+  /* The mark joins the normal flow above the statement, right-aligned,
+     so it can never overlap the text however short the screen is. */
   .hero-mark {
-    top: 0;
-    right: 0;
-    width: 68px;
-    height: 68px;
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 58px;
+    height: 58px;
+    margin: 0 0 22px auto;
   }
-  /* statement: smaller ceiling so it doesn't dwarf the screen */
   .hero-statement {
-    font-size: clamp(40px, 12vw, 64px);
+    font-size: clamp(38px, 11.6vw, 60px);
     max-width: none;
   }
   .hero-labels {
-    gap: 22px;
-    margin-top: 36px;
+    gap: 14px 24px;
+    margin-top: 30px;
   }
   .hero-label { max-width: none; flex: 1 1 100%; }
+  .hero-label-val { font-size: 14px; }
 }
 
 /* ============================================================
@@ -850,9 +871,16 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* Tabs wrap cleanly on small screens */
-@media (max-width: 480px) {
-  .work-tabs { width: 100%; }
-  .work-tab { flex: 1; justify-content: center; }
+.work-tab-short { display: none; }
+@media (max-width: 560px) {
+  .work-tabs { width: 100%; flex-wrap: wrap; }
+  .work-tab {
+    flex: 1 1 calc(50% - 4px);
+    justify-content: center;
+    padding: 11px 10px !important;
+  }
+  .work-tab-long { display: none; }
+  .work-tab-short { display: inline; }
 }
 
 /* ============================================================
@@ -905,7 +933,9 @@ button { font-family: inherit; cursor: pointer; }
   width: 100%;
   height: 100%;
   overflow: hidden;
-  touch-action: none;
+  /* Single-finger swipes go to our JS; multi-finger pinch is handled
+     natively by the browser so visitors can zoom into EPK pages. */
+  touch-action: pinch-zoom;
 }
 /* Horizontal track — one full-width column per category */
 .ml-lightbox-htrack {
@@ -1021,6 +1051,8 @@ button { font-family: inherit; cursor: pointer; }
   height: 100%;
   object-fit: contain;
   display: block;
+  /* Lets the browser pinch-zoom into the EPK page natively */
+  touch-action: pinch-zoom;
 }
 /* Page dots — bottom centre */
 .ml-pages-dots {
@@ -1208,6 +1240,257 @@ button { font-family: inherit; cursor: pointer; }
 .vimeo-mute svg {
   width: 20px;
   height: 20px;
+}
+
+/* ---- Rotate-hint sublabel (pinch-to-zoom cue) ---- */
+.ml-rotate-sublabel {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--kami) 70%, transparent);
+  margin-top: -8px;
+}
+
+/* ============================================================
+   LANDSCAPE MOBILE — fill the screen for the EPK
+   ============================================================ */
+@media (orientation: landscape) and (max-height: 500px) {
+  /* Lightbox shell loses its padding so the page gets all the pixels */
+  .ml-lightbox {
+    padding: 0;
+    /* dvh tracks browser chrome — grows as bars hide on scroll */
+    height: 100dvh;
+  }
+  /* EPK page frame fills the entire viewport */
+  .ml-lightbox-frame.is-pages {
+    width: 100vw;
+    height: 100dvh;
+    max-width: 100vw;
+    max-height: 100dvh;
+    aspect-ratio: auto;
+  }
+  /* Hide the meta strip under the frame (no room) */
+  .ml-lightbox-slide .ml-lightbox-meta { display: none; }
+  /* Shrink chrome so it doesn't eat space */
+  .ml-lightbox-close {
+    top: 6px;
+    right: 6px;
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+  .ml-lightbox-count { top: 8px; left: 10px; font-size: 10px; }
+  /* Page counter + dots move tight to the edges */
+  .ml-pages-count { top: 6px; }
+  .ml-pages-dots { bottom: 8px; }
+}
+
+/* ============================================================
+   WEB STACK — all 3 sites cascading in one lightbox slide
+   ============================================================ */
+.ml-lightbox-frame.is-stack {
+  width: min(94vw, 1180px);
+  height: min(82vh, 920px);
+  aspect-ratio: auto;
+  overflow: hidden;
+  position: relative;
+}
+@media (max-width: 640px) {
+  .ml-lightbox-frame.is-stack {
+    width: 94vw;
+    height: 78vh;
+    max-height: 78vh;
+  }
+}
+.ml-stack {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+/* Colourful backdrop — sumi base + red glows + faint grid */
+.ml-stack-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 60% at 10% 10%, color-mix(in srgb, var(--accent) 70%, transparent), transparent 60%),
+    radial-gradient(70% 70% at 95% 95%, color-mix(in srgb, var(--accent) 38%, transparent), transparent 65%),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--kami) 4%, transparent) 0 1px,
+      transparent 1px 36px
+    ),
+    var(--sumi);
+}
+
+/* Header in the top-left */
+.ml-stack-header {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 56%;
+  pointer-events: none;
+}
+.ml-stack-kicker {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--kami);
+  opacity: 0.7;
+}
+.ml-stack-title {
+  font-size: clamp(22px, 3.4vw, 38px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--kami);
+}
+.ml-stack-hint {
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  animation: stackHintPulse 2.6s ease-in-out infinite;
+}
+@keyframes stackHintPulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+@media (max-width: 640px) {
+  .ml-stack-header {
+    top: 14px;
+    left: 14px;
+    max-width: 90%;
+  }
+}
+
+/* The three cascading windows */
+.ml-stack-windows {
+  position: absolute;
+  inset: 0;
+}
+.ml-stack-window {
+  position: absolute;
+  width: 56%;
+  background: var(--sumi-2);
+  border: 1px solid var(--rule-strong);
+  box-shadow: 0 26px 50px -10px rgba(0,0,0,0.6),
+              0 6px 16px -4px rgba(0,0,0,0.5);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: transform 480ms cubic-bezier(.2,.8,.2,1),
+              box-shadow 320ms ease;
+}
+/* Cascade — diagonal from upper-right down to lower-right */
+.ml-stack-window-1 {
+  top: 24%;
+  right: 6%;
+  transform: rotate(-4deg);
+  z-index: 3;
+}
+.ml-stack-window-2 {
+  top: 44%;
+  right: 14%;
+  transform: rotate(2deg);
+  z-index: 2;
+}
+.ml-stack-window-3 {
+  top: 64%;
+  right: 4%;
+  transform: rotate(-1deg);
+  z-index: 1;
+}
+.ml-stack-window:hover {
+  transform: rotate(0deg) translateY(-6px) scale(1.03);
+  z-index: 5;
+  box-shadow: 0 32px 60px -10px rgba(0,0,0,0.7),
+              0 8px 20px -4px rgba(188,0,45,0.35);
+}
+.ml-stack-chrome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #131313;
+  border-bottom: 1px solid var(--rule-strong);
+}
+.ml-stack-chrome > span:not(.ml-stack-url) {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hai-2);
+}
+.ml-stack-chrome > span:first-child { background: var(--accent); }
+.ml-stack-url {
+  margin-left: 8px;
+  font-size: 10px;
+  color: color-mix(in srgb, var(--kami) 70%, transparent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ml-stack-screen {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  position: relative;
+}
+.ml-stack-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+}
+.ml-stack-caption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  background: #0d0d0d;
+  border-top: 1px solid var(--rule);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--kami);
+}
+.ml-stack-caption-title {
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0.04em;
+}
+.ml-stack-caption-client {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--kami) 55%, transparent);
+}
+@media (max-width: 640px) {
+  .ml-stack-caption-client { display: none; }
+}
+.ml-stack-caption-arrow {
+  color: var(--accent);
+  font-size: 13px;
+}
+@media (max-width: 640px) {
+  /* Tighter cascade on phone — windows take more width, smaller offsets */
+  .ml-stack-window { width: 78%; }
+  .ml-stack-window-1 { top: 26%; right: 4%; }
+  .ml-stack-window-2 { top: 48%; right: 10%; }
+  .ml-stack-window-3 { top: 70%; right: 4%; }
+  .ml-stack-window:hover {
+    /* hover doesn't really apply on touch; reset so :active doesn't jolt */
+    transform: rotate(0deg);
+  }
+  .ml-stack-screen { aspect-ratio: 16 / 9; }
 }
 
 /* ---- Website piece — browser-chrome frame (lightbox) ---- */
@@ -1562,4 +1845,41 @@ button { font-family: inherit; cursor: pointer; }
 
 @media (max-width: 560px) {
   .contact-card { min-height: 0; padding: 28px 24px; }
+}
+
+/* ============================================================
+   ACCESSIBILITY — keyboard focus + reduced motion
+   ============================================================ */
+
+/* Visible focus for keyboard users only (mouse/touch clicks stay clean) */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.work-card:focus-visible .work-card-frame {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* Respect "reduce motion": stop the continuous animations, keep the
+   functional ones instant. */
+@media (prefers-reduced-motion: reduce) {
+  .ml-marq-track,
+  .work-card-site-tag-dot,
+  .ml-stack-hint,
+  .ml-hint-dot,
+  .ml-hint-chevrons span {
+    animation: none !important;
+  }
+  .reveal-word > span,
+  .page-fade,
+  .ml-lightbox {
+    animation-duration: 1ms !important;
+  }
+  .ml-lightbox-htrack,
+  .ml-lightbox-vtrack,
+  .ml-pages-track,
+  .ml-lightbox-slide {
+    transition-duration: 1ms !important;
+  }
 }

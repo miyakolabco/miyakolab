@@ -17,6 +17,49 @@
 
 import { useEffect, useRef, useState } from "react";
 
+// Background mode (grid cards) — the iframe is only created once the card
+// scrolls within ~300px of the viewport. Three autoplaying players on first
+// paint was the heaviest thing on the page, especially on phones.
+function LazyBackgroundEmbed({ src }) {
+  const ref = useRef(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "300px 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} style={{ position: "absolute", inset: 0 }}>
+      {inView && (
+        <iframe
+          src={src}
+          title="Miyako Lab — video"
+          loading="lazy"
+          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+          referrerPolicy="strict-origin-when-cross-origin"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, display: "block" }}
+        />
+      )}
+    </div>
+  );
+}
+
 export function VimeoPlayer({ id, mode = "player" }) {
   const isBg = mode === "background";
   const iframeRef = useRef(null);
@@ -85,17 +128,9 @@ export function VimeoPlayer({ id, mode = "player" }) {
     return () => window.removeEventListener("message", onMsg);
   }, [isBg]);
 
-  // Background mode — no overlay, no controls
+  // Background mode — no overlay, no controls, lazy-mounted
   if (isBg) {
-    return (
-      <iframe
-        src={src}
-        title="Miyako Lab — video"
-        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-        referrerPolicy="strict-origin-when-cross-origin"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0, display: "block" }}
-      />
-    );
+    return <LazyBackgroundEmbed src={src} />;
   }
 
   // Show a brief icon flash so taps feel responsive

@@ -3,27 +3,22 @@
 // Contact — no form. The studio prefers to talk to clients directly,
 // so the page's job is to make email + WhatsApp the obvious next step.
 //
-// TO EDIT YOUR DETAILS: change the constants just below.
+// TO EDIT YOUR DETAILS: change lib/site.js (email, WhatsApp, Instagram).
 
 import { useEffect, useState } from "react";
+import { SITE } from "@/lib/site";
 import { Reveal, FancyLink } from "@/components/Anim";
 import { Footer } from "@/components/Footer";
 
-// ----- Your contact details — edit these -----
-const EMAIL = "alin@miyakolab.co";
-// WhatsApp number in full international format, digits only (no +, spaces, dashes).
-// Example: UK mobile 07911 123456 → "447911123456"
-const WHATSAPP_NUMBER = "817084991493";
+const EMAIL = SITE.email;
+const INSTAGRAM = SITE.instagram;
 const WHATSAPP_PREFILL = "Hi Miyako Lab — I'd like to talk about a project.";
-const INSTAGRAM = "https://www.instagram.com/miyakolab.co";
-// ---------------------------------------------
-
-const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_PREFILL)}`;
+const whatsappLink = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(WHATSAPP_PREFILL)}`;
 
 export default function Contact() {
   return (
     <>
-      <div className="page page-fade">
+      <main className="page page-fade">
         {/* Hero */}
         <section className="frame" style={{ paddingTop: 96, paddingBottom: 40 }}>
           <Reveal
@@ -75,7 +70,7 @@ export default function Contact() {
               <a
                 href={whatsappLink}
                 target="_blank"
-                rel="noopener"
+                rel="noopener noreferrer"
                 className="contact-card"
               >
                 <span className="mono contact-card-kicker">WhatsApp</span>
@@ -97,11 +92,11 @@ export default function Contact() {
             <Reveal>
               <div className="eyebrow" style={{ marginBottom: 16 }}>How we work</div>
               <p style={{ fontSize: 20, lineHeight: 1.5, margin: 0, fontWeight: 300, maxWidth: 640 }}>
-                Most projects are video and design for hospitality and
-                nightlife — launch films, social campaigns, flyers, menus,
-                print. We like to start with a conversation rather than a
-                brief form: it&apos;s faster, and it&apos;s how good work
-                usually starts.
+                Most projects are video and design for nightlife and
+                hospitality — event films, social edits, flyers, DJ EPKs,
+                menus and websites. We like to start with a conversation
+                rather than a brief form: it&apos;s faster, and it&apos;s how
+                good work usually starts.
               </p>
               <div style={{ display: "flex", gap: 24, marginTop: 28, flexWrap: "wrap" }}>
                 <FancyLink href={`mailto:${EMAIL}`}>{EMAIL}</FancyLink>
@@ -119,7 +114,7 @@ export default function Contact() {
                     Miyako Lab
                   </div>
                   <div style={{ color: "var(--fg-dim)", marginTop: 8, lineHeight: 1.6 }}>
-                    <span className="jp">大阪</span> &middot; Osaka, Japan
+                    <span className="jp">{SITE.cityJp}</span> &middot; {SITE.city}, {SITE.country}
                   </div>
                 </div>
 
@@ -137,7 +132,7 @@ export default function Contact() {
             </Reveal>
           </div>
         </section>
-      </div>
+      </main>
       <Footer />
     </>
   );
